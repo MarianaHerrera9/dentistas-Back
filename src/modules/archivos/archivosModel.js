@@ -8,12 +8,14 @@ const guardarArchivo = async ({
                                   nombre_archivo,
                                   descripcion,
                               }) => {
+    
+    const idConsultaValue = id_consulta ?? null;
     const [result] = await db.query(
         `INSERT INTO archivos_clinicas
-     (id_consulta, id_paciente, tipo, ruta_archivo, nombre_archivo, descripcion)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+        (id_consulta, id_paciente, tipo, ruta_archivo, nombre_archivo, descripcion)
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
-            id_consulta,
+            idConsultaValue,
             id_paciente,
             tipo,
             ruta_archivo,
