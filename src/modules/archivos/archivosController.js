@@ -3,13 +3,13 @@ const { guardarArchivo, obtenerArchivos } = require("./archivosModel");
 
 const subirArchivo = async (req, res) => {
     try {
-        const { id_consulta, id_paciente, tipo, descripcion } = req.body;
+        let { id_consulta, id_paciente, tipo, descripcion } = req.body;
         const file = req.file;
 
         if (!file) {
             return res.status(400).json({ message: "Archivo requerido" });
         }
-
+        id_consulta = id_consulta && id_consulta !== '' ? Number(id_consulta) : null;
         const filePath = `${Date.now()}-${file.originalname}`;
 
         // 1️⃣ SUBIR ARCHIVO

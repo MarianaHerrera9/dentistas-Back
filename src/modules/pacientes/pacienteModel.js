@@ -55,10 +55,15 @@ const Paciente = {
     return result.affectedRows;
   },
   async delete(id_paciente) {
-    const [result] = await db.execute('UPDATE pacientes SET activo = false WHERE id_paciente = ?', [id_paciente]);
+    const [result] = await db.execute(
+      `UPDATE pacientes 
+     SET activo = NOT activo 
+     WHERE id_paciente = ?`,
+      [id_paciente]
+    );
+
     return result.affectedRows;
-  },
-    
+  },    
   async findByClinica(id_clinica) {
     const [rows] = await db.execute(
       'SELECT * FROM pacientes WHERE id_clinica = ?',

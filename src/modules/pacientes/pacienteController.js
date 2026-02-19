@@ -29,7 +29,7 @@ exports.getPacienteById = async (req, res) => {
 
         const paciente = await Paciente.findById(id);
 
-        if (!paciente || paciente.activo === 0) {
+        if (!paciente) {
             return res.status(404).json({ error: 'Paciente no encontrado' });
         }
 
