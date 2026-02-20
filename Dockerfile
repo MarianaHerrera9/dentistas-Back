@@ -17,4 +17,4 @@ EXPOSE 3001
 
 
 # Comando de inicio
-CMD ["npm", "start"]
+CMD ["node", "src/index.js"]
