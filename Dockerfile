@@ -12,9 +12,11 @@ RUN npm install
 # Copiar todo el código
 COPY . .
 
+WORKDIR /app/src
+
 # Exponer puerto
 EXPOSE 3001
 
 
 # Comando de inicio
-CMD ["npm", "start"]
+CMD ["npm", "index.js"]
