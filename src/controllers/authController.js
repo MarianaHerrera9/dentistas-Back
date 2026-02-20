@@ -7,6 +7,7 @@ const Rol = require('../models/rolModel');
 const RolPermiso = require('../models/rolPermisoModel');
 const Permiso = require('../models/permisoModel');
 const Dentista = require('../modules/dentistas/dentistaModel');
+const AdminSaas = require('../models/adminSaasModel');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'clave-super-secreta';
 
@@ -39,7 +40,7 @@ exports.registroClinica = async (req, res) => {
     // -----------------------------------------
     // 3. Obtener permisos globales excepto gestionar_saas
     // -----------------------------------------
-    const permisos = await Permiso.getAllForClinica(connection); 
+    const permisos = await Permiso.getAllForClinica(connection);
     // (getAllForClinica NO trae gestionar_saas)
 
     // 4. Asignar permisos a este rol
@@ -75,9 +76,9 @@ exports.registroClinica = async (req, res) => {
     // 7. Generar token
     // -----------------------------------------
     const token = jwt.sign(
-      { id_usuario, id_clinica, id_rol },
-      JWT_SECRET,
-      { expiresIn: '8h' }
+        { id_usuario, id_clinica, id_rol },
+        JWT_SECRET,
+        { expiresIn: '8h' }
     );
 
     res.status(201).json({
@@ -98,51 +99,65 @@ exports.login = async (req, res) => {
   try {
     const { usuario, password } = req.body;
 
+    console.log('Login intento:', usuario);
+
     if (!usuario || !password) {
       return res.status(400).json({ mensaje: 'Datos incompletos' });
     }
 
-    // 1. Buscar usuario
-    const user = await Usuario.findByUsuarioWithRol(usuario);
-    console.log(user);
+    // 1. Buscar primero en usuarios de clínica
+    let user = await Usuario.findByUsuarioWithRol(usuario);
+    let tipo = 'clinica';
+
+    console.log('Resultado usuarios_login:', user);
+
+    // 2. Si no existe, buscar en admins del SaaS
     if (!user) {
+      user = await AdminSaas.findByUsuarioWithRol(usuario);
+      tipo = 'saas';
+      console.log('Resultado admins_saas:', user);
+    }
+
+    if (!user) {
+      console.log('No se encontró usuario');
       return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
     }
 
-    // 2. Validar contraseña
+    console.log('Password recibido:', `"${password}"`);
+    console.log('Hash DB:', user.password_hash);
+
+
+    // 3. Validar contraseña
     const coincide = await bcrypt.compare(password, user.password_hash);
+    console.log('Coincide contraseña:', coincide);
+
     if (!coincide) {
       return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos' });
     }
 
-    // 3. Obtener permisos del rol
     const permisos = await Permiso.getPermisosByRol(user.id_rol);
 
-    // 4. Generar token con permisos incluidos
-    const token = jwt.sign(
-        {
-          id_usuario: user.id_usuario,
-          id_clinica: user.id_clinica,
-          id_dentista: user.id_dentista,
-          id_rol: user.id_rol,
-          nombre_rol: user.nombre_rol,
-          permisos
-        },
-        JWT_SECRET,
-        { expiresIn: '8h' }
-    );
+    const payload = {
+      tipo_usuario: tipo,
+      id_rol: user.id_rol,
+      nombre_rol: user.nombre_rol,
+      permisos
+    };
 
-    // 5. Respuesta final
+    if (tipo === 'clinica') {
+      payload.id_usuario = user.id_usuario;
+      payload.id_clinica = user.id_clinica;
+      payload.id_dentista = user.id_dentista;
+    } else {
+      payload.id_admin = user.id_admin;
+    }
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
     res.json({
       mensaje: 'Login exitoso',
       token,
-      usuario: {
-        id_usuario: user.id_usuario,
-        id_clinica: user.id_clinica,
-        id_rol: user.id_rol,
-        nombre_rol: user.nombre_rol,
-        permisos
-      }
+      usuario: payload
     });
 
   } catch (err) {
@@ -150,3 +165,5 @@ exports.login = async (req, res) => {
     res.status(500).json({ mensaje: 'Error interno de servidor' });
   }
 };
+
+

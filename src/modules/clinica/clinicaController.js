@@ -3,6 +3,52 @@ const supabase = require("../../config/supabase");
 const path = require("path");
 
 const ClinicaController = {
+
+  async getAll(req, res) {
+    try {
+      const [rows] = await db.execute(`
+      SELECT 
+        id_clinica,
+        nombre,
+        subdominio,
+        direccion,
+        telefono,
+        correo_contacto AS correo,
+        plan_saas AS plan,
+        logo_url,
+        color_principal,
+        color_secundario,
+        color_extra,
+        activo
+      FROM clinicas
+      ORDER BY id_clinica DESC
+    `);
+
+      const clinicas = await Promise.all(
+          rows.map(async (clinica) => {
+            if (clinica.logo_url) {
+              const { data, error } = await supabase.storage
+                  .from("archivos")
+                  .createSignedUrl(clinica.logo_url, 60 * 60);
+
+              if (!error && data?.signedUrl) {
+                clinica.logo_url = data.signedUrl;
+              } else {
+                clinica.logo_url = null;
+              }
+            }
+
+            return clinica;
+          })
+      );
+
+      res.json(clinicas);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al obtener clínicas" });
+    }
+  },
+
   async getById(req, res) {
     try {
       const { id } = req.params;

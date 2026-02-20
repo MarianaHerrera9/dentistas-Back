@@ -10,6 +10,13 @@ router.post('/register',authMiddleware, checkPermiso('permisos_clinica'), authCo
 router.post('/auth/login', authController.login);
 
 router.get(
+    '/',
+    authMiddleware,
+    checkPermiso('gestionar_saas'),
+    ClinicaController.getAll
+);
+
+router.get(
     '/:id',
     authMiddleware,
     ClinicaController.getById
