@@ -12,8 +12,6 @@ RUN npm install
 # Copiar todo el código
 COPY . .
 
-WORKDIR /app/src
-
 # Exponer puerto
 EXPOSE 3001
 
