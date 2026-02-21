@@ -29,7 +29,17 @@ const usuariosRoutes = require('./routes/usuariosRoutes');
 const archivosRoutes = require("./modules/archivos/archivosRoutes");
 const app = express();
 
-app.use(helmet());
+app.use(
+    helmet({
+      crossOriginResourcePolicy: false,
+    })
+);
+
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+});
+
 const corsOptions = {
   origin: ['https://asist-dental.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -63,9 +73,13 @@ app.use('/movimientos-productos', movimientosProductosRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/usuarios', usuariosRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
-app.use('/uploads', cors(corsOptions), express.static('uploads'));
-app.use("/api/archivos", archivosRoutes);
 
+const path = require("path");
+
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"))
+);app.use("/api/archivos", archivosRoutes);
 
 app.get('/', (req, res) => {
   res.send('API AsistDental Backend funcionando correctamente');

@@ -175,7 +175,7 @@ const ClinicaController = {
       }
 
       // Ruta relativa para guardar en DB
-      const fileUrl = `/uploads/logos/${file.filename}`;
+      const fileUrl = `uploads/logos/${file.filename}`;
 
       await db.execute(
           "UPDATE clinicas SET logo_url = ? WHERE id_clinica = ?",
