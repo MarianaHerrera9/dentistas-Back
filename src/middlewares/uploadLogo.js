@@ -3,7 +3,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const uploadPath = path.join(__dirname, "../../uploads/clinicas");
+// Ruta fija para todos los logos
+const uploadPath = path.join(__dirname, "../../uploads/logos");
 
 // Crear carpeta si no existe
 if (!fs.existsSync(uploadPath)) {
@@ -12,14 +13,11 @@ if (!fs.existsSync(uploadPath)) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const idClinica = req.params.id;
-    const clinicaPath = path.join(uploadPath, idClinica.toString());
-    if (!fs.existsSync(clinicaPath)) fs.mkdirSync(clinicaPath, { recursive: true });
-    cb(null, clinicaPath);
+    cb(null, uploadPath); // Siempre guarda en uploads/logos
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    cb(null, `logo-${Date.now()}${ext}`);
+    cb(null, `logo-${Date.now()}${ext}`); // Nombre único por timestamp
   },
 });
 
