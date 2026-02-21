@@ -1,33 +1,31 @@
+// middlewares/uploadLogo.js
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const uploadPath = path.join(__dirname, "../../uploads/clinicas/logos");
+const uploadPath = path.join(__dirname, "../../uploads/clinicas");
 
+// Crear carpeta si no existe
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadPath);
+    const idClinica = req.params.id;
+    const clinicaPath = path.join(uploadPath, idClinica.toString());
+    if (!fs.existsSync(clinicaPath)) fs.mkdirSync(clinicaPath, { recursive: true });
+    cb(null, clinicaPath);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const uniqueName = `logo-${Date.now()}${ext}`;
-    cb(null, uniqueName);
+    cb(null, `logo-${Date.now()}${ext}`);
   },
 });
 
-const uploadClinicaLogo = multer({
+const uploadLogo = multer({
   storage,
-  fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowed.includes(file.mimetype)) {
-      return cb(new Error("Formato no permitido"));
-    }
-    cb(null, true);
-  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB máximo
 });
 
-module.exports = uploadClinicaLogo;
+module.exports = uploadLogo;

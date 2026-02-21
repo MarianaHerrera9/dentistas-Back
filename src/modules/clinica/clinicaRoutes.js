@@ -2,9 +2,9 @@ const express = require('express');
 const authController = require('../../controllers/authController');
 const ClinicaController = require('./clinicaController');
 const checkPermiso = require('../../middlewares/checkPermiso');
-const upload = require("../../middlewares/upload");
 const authMiddleware = require('../../middlewares/authMiddleware');
 const router = express.Router();
+const uploadLogo = require('../../middlewares/uploadLogo');
 
 router.post('/register',authMiddleware, checkPermiso('permisos_clinica'), authController.registroClinica);
 router.post('/auth/login', authController.login);
@@ -29,11 +29,7 @@ router.put(
     ClinicaController.update
 );
 
+router.post("/:id/logo", uploadLogo.single("logo"), ClinicaController.uploadLogo);
 
-router.post(
-  "/:id/logo",
-  upload.single("logo"),
-  ClinicaController.uploadLogo
-);
 
 module.exports = router;

@@ -172,32 +172,25 @@ const ClinicaController = {
 },
 
   async uploadLogo(req, res) {
-  try {
-    const { id } = req.params;
+    try {
+      const { id } = req.params;
+      const file = req.file;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Archivo requerido" });
-    }
+      if (!file) {
+        return res.status(400).json({ message: "Archivo requerido" });
+      }
 
-    const ext = path.extname(req.file.originalname);
-    const filePath = `clinicas/${id}/logo-${Date.now()}${ext}`;
+      // Ruta relativa para guardar en DB
+      const fileUrl = `/uploads/clinicas/${id}/${file.filename}`;
 
-    const { error } = await supabase.storage
-      .from("archivos")
-      .upload(filePath, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: true,
-      });
+      await db.execute(
+          "UPDATE clinicas SET logo_url = ? WHERE id_clinica = ?",
+          [fileUrl, id]
+      );
 
-    if (error) throw error;
-
-    await db.execute(
-      "UPDATE clinicas SET logo_url = ? WHERE id_clinica = ?",
-      [filePath, id]
-    );
-
-    const [rows] = await db.execute(
-      `
+      // Obtener clínica actualizada
+      const [rows] = await db.execute(
+          `
       SELECT 
         id_clinica,
         nombre,
@@ -213,30 +206,23 @@ const ClinicaController = {
       FROM clinicas
       WHERE id_clinica = ?
       `,
-      [id]
-    );
+          [id]
+      );
 
-    const clinica = rows[0];
+      const clinica = rows[0];
 
-    if (clinica.logo_url) {
-      const { data, error } = await supabase.storage
-        .from("archivos")
-        .createSignedUrl(clinica.logo_url, 60 * 60);
-
-      if (!error && data?.signedUrl) {
-        clinica.logo_url = data.signedUrl;
-      } else {
-        clinica.logo_url = null;
+      // Convertir la ruta local en URL accesible
+      if (clinica.logo_url) {
+        clinica.logo_url = `${req.protocol}://${req.get("host")}${clinica.logo_url}`;
       }
+
+      res.json(clinica);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al subir logo" });
     }
-
-    res.json(clinica);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al subir logo" });
   }
-}
 };
 
 module.exports = ClinicaController;
