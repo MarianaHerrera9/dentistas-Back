@@ -30,7 +30,13 @@ const archivosRoutes = require("./modules/archivos/archivosRoutes");
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+const corsOptions = {
+  origin: ['https://asist-dental.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -57,7 +63,7 @@ app.use('/movimientos-productos', movimientosProductosRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/usuarios', usuariosRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
-app.use("/uploads", express.static("uploads"));
+app.use('/uploads', cors(corsOptions), express.static('uploads'));
 app.use("/api/archivos", archivosRoutes);
 
 
