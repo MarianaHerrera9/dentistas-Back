@@ -39,8 +39,15 @@ const listarArchivos = async (req, res) => {
         const { id_consulta, id_paciente } = req.query;
         const archivos = await obtenerArchivos({ id_consulta, id_paciente });
 
-        res.json({ archivos });
+        // Crear la URL completa para cada archivo
+        const archivosConUrl = archivos.map((archivo) => {
+            return {
+                ...archivo,
+                url_archivo: `https://asist-dental-backend.sb3emv.easypanel.host${archivo.ruta_archivo}`
+            };
+        });
 
+        res.json({ archivos: archivosConUrl });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error al obtener archivos" });
