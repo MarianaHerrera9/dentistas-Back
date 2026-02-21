@@ -27,8 +27,6 @@ const movimientosProductosRoutes = require('./modules/inventario/movimientos_pro
 const rolesRoutes = require('./routes/rolesRoutes'); 
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const archivosRoutes = require("./modules/archivos/archivosRoutes");
-import {upload} from "./middlewares/upload";
-
 const app = express();
 
 app.use(helmet());
@@ -61,14 +59,6 @@ app.use('/usuarios', usuariosRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
 app.use("/uploads", express.static("uploads"));
 app.use("/api/archivos", archivosRoutes);
-
-app.post("/upload", upload.single("file"), (req, res) => {
-  res.json({
-    message: "Archivo subido correctamente",
-    url: `/uploads/${req.file.filename}`,
-  });
-});
-app.use(errorHandler);
 
 
 app.get('/', (req, res) => {
