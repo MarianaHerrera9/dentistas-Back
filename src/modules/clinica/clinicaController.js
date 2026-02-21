@@ -54,23 +54,23 @@ const ClinicaController = {
       const { id } = req.params;
 
       const [rows] = await db.execute(
-        `
-        SELECT 
-          id_clinica,
-          nombre,
-          subdominio,
-          direccion,
-          telefono,
-          correo_contacto AS correo,
-          plan_saas AS plan,
-          logo_url,
-          color_principal,
-          color_secundario,
-          color_extra
-        FROM clinicas
-        WHERE id_clinica = ?
-        `,
-        [id]
+          `
+      SELECT 
+        id_clinica,
+        nombre,
+        subdominio,
+        direccion,
+        telefono,
+        correo_contacto AS correo,
+        plan_saas AS plan,
+        logo_url,
+        color_principal,
+        color_secundario,
+        color_extra
+      FROM clinicas
+      WHERE id_clinica = ?
+      `,
+          [id]
       );
 
       if (!rows.length) {
@@ -79,16 +79,10 @@ const ClinicaController = {
 
       const clinica = rows[0];
 
+      // Si hay un logo, construimos la URL pública
       if (clinica.logo_url) {
-        const { data, error } = await supabase.storage
-          .from("archivos")
-          .createSignedUrl(clinica.logo_url, 60 * 60); 
-
-        if (!error && data?.signedUrl) {
-          clinica.logo_url = data.signedUrl;
-        } else {
-          clinica.logo_url = null;
-        }
+        // Asume que logo_url guarda solo el nombre de archivo, ej: "logo-12345.jpg"
+        clinica.logo_url = `http://asist-dental-backend.sb3emv.easypanel.host/uploads/logos/${clinica.logo_url}`;
       }
 
       res.json(clinica);
