@@ -82,7 +82,7 @@ const ClinicaController = {
       // Si hay un logo, construimos la URL pública
       if (clinica.logo_url) {
         // Asume que logo_url guarda solo el nombre de archivo, ej: "logo-12345.jpg"
-        clinica.logo_url = `http://asist-dental-backend.sb3emv.easypanel.host/uploads/logos/${clinica.logo_url}`;
+        clinica.logo_url = `http://asist-dental-backend.sb3emv.easypanel.host/${clinica.logo_url}`;
       }
 
       res.json(clinica);
