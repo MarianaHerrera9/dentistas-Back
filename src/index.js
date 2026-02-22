@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 });
 
 const corsOptions = {
-  origin: ['https://asist-dental.com'],
+  origin: ['https://asist-dental.com', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 };
 
