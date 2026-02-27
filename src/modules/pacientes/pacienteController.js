@@ -3,8 +3,27 @@ const Odontograma = require('../odontogramas/models/odontogramaModel');
 
 exports.createPaciente = async (req, res) => {
     try {
+        const { id_clinica, nombre, apellido_paterno, apellido_materno, force } = req.body;
+
+        // 🔎 Verificar duplicado
+        if (!force) {
+            const existente = await Paciente.existsByNombre(
+                id_clinica,
+                nombre,
+                apellido_paterno,
+                apellido_materno
+            );
+
+            if (existente) {
+                return res.status(409).json({
+                    duplicated: true,
+                    message: 'Ya existe un paciente con ese nombre',
+                });
+            }
+        }
+
+        // 🟢 Crear paciente
         const nuevoPacienteId = await Paciente.create(req.body);
-        const id_clinica = req.body.id_clinica;
 
         const nuevoOdontogramaId = await Odontograma.create({
             id_clinica,
@@ -15,8 +34,8 @@ exports.createPaciente = async (req, res) => {
             message: 'Paciente creado correctamente',
             id_paciente: nuevoPacienteId,
             id_odontograma: nuevoOdontogramaId
-
         });
+
     } catch (error) {
         console.error('Error al crear paciente:', error);
         res.status(500).json({ error: 'Error interno al crear paciente' });

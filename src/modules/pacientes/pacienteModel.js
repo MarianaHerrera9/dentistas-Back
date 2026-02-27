@@ -38,7 +38,23 @@ const Paciente = {
           ]
         );
         return result.insertId;
-      },      
+      },
+
+    async existsByNombre(id_clinica, nombre, apellido_paterno, apellido_materno) {
+        const [rows] = await db.execute(
+            `SELECT id_paciente 
+     FROM pacientes 
+     WHERE id_clinica = ? 
+     AND nombre = ? 
+     AND apellido_paterno = ? 
+     AND (apellido_materno = ? OR apellido_materno IS NULL)
+     LIMIT 1`,
+            [id_clinica, nombre, apellido_paterno, apellido_materno ?? null]
+        );
+
+        return rows[0];
+    },
+
   async findById(id_paciente) {
     const [rows] = await db.execute('SELECT * FROM pacientes WHERE id_paciente = ?', [id_paciente]);
     return rows[0];
