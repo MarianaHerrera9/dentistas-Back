@@ -1,5 +1,4 @@
 const db = require("../../config/db");
-const supabase = require("../../config/supabase");
 const path = require("path");
 
 const ClinicaController = {
@@ -24,23 +23,12 @@ const ClinicaController = {
       ORDER BY id_clinica DESC
     `);
 
-      const clinicas = await Promise.all(
-          rows.map(async (clinica) => {
-            if (clinica.logo_url) {
-              const { data, error } = await supabase.storage
-                  .from("archivos")
-                  .createSignedUrl(clinica.logo_url, 60 * 60);
-
-              if (!error && data?.signedUrl) {
-                clinica.logo_url = data.signedUrl;
-              } else {
-                clinica.logo_url = null;
-              }
-            }
-
-            return clinica;
-          })
-      );
+      const clinicas = rows.map((clinica) => ({
+        ...clinica,
+        logo_url: clinica.logo_url
+            ? `${req.protocol}://${req.get("host")}/${clinica.logo_url}`
+            : null,
+      }));
 
       res.json(clinicas);
     } catch (error) {
@@ -146,15 +134,8 @@ const ClinicaController = {
     const clinica = rows[0];
 
     if (clinica.logo_url) {
-      const { data, error } = await supabase.storage
-        .from("archivos")
-        .createSignedUrl(clinica.logo_url, 60 * 60);
-
-      if (!error && data?.signedUrl) {
-        clinica.logo_url = data.signedUrl;
-      } else {
-        clinica.logo_url = null;
-      }
+      clinica.logo_url =
+          `${req.protocol}://${req.get("host")}/${clinica.logo_url}`;
     }
 
     res.json(clinica);
