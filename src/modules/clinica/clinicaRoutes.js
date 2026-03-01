@@ -6,7 +6,7 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 const router = express.Router();
 const uploadLogo = require('../../middlewares/uploadLogo');
 
-router.post('/register',authMiddleware, checkPermiso('permisos_clinica'), authController.registroClinica);
+router.post('/register',authMiddleware, checkPermiso('gestionar_saas'), authController.registroClinica);
 router.post('/auth/login', authController.login);
 
 router.get(
