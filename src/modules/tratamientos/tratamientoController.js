@@ -3,13 +3,23 @@ const Tratamiento = require('./tratamientoModel');
 exports.createTratamiento = async (req, res) => {
     try {
         const id_plan = await Tratamiento.create(req.body);
+
         res.status(201).json({
             mensaje: 'Plan de tratamiento creado',
             id_plan
         });
+
     } catch (error) {
+        console.error("🔥 ERROR CREATE TRATAMIENTO:");
         console.error(error);
-        res.status(500).json({ mensaje: 'Error interno al crear tratamiento' });
+
+        res.status(500).json({
+            mensaje: 'Error interno al crear tratamiento',
+            error: error.message,
+            sqlMessage: error.sqlMessage,
+            code: error.code,
+            errno: error.errno
+        });
     }
 };
 
