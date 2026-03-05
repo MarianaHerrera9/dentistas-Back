@@ -1,14 +1,13 @@
-const db = require('../config/db');
+const db = require('../db/index');
+const { rolPermiso } = require('../db/schema');
 
 const RolPermiso = {
-    async assign(id_rol, id_permiso) {
-      await db.execute(
-        `INSERT INTO rol_permiso (id_rol, id_permiso)
-         VALUES (?, ?)`,
-        [id_rol, id_permiso]
-      );
-    }
-  };
-  
-  module.exports = RolPermiso;
-  
+  async assign(id_rol, id_permiso) {
+    await db.insert(rolPermiso).values({
+      idRol: id_rol,
+      idPermiso: id_permiso
+    });
+  }
+};
+
+module.exports = RolPermiso;

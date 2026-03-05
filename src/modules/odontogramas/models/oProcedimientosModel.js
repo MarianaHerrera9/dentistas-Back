@@ -1,4 +1,12 @@
-const db = require('../../../config/db');
+const db = require('../../../db/index');
+const { eq, sql } = require('drizzle-orm');
+const {
+    odontogramaProcedimientos,
+    planTratamientoProcedimientos,
+    catalogoProcedimientos,
+    dentistas,
+    planTratamiento
+} = require('../../../db/schema');
 
 const OdontogramaProcedimiento = {
     async add(data, connection = db) {
@@ -11,64 +19,53 @@ const OdontogramaProcedimiento = {
             descripcion
         } = data;
 
-        const [result] = await connection.query(
-            `INSERT INTO odontograma_procedimientos
-             (id_odontograma, id_dentista, id_plan, id_plan_tratamiento_procedimiento, id_diagnostico, descripcion)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-                id_odontograma,
-                id_dentista,
-                id_plan,
-                id_plan_tratamiento_procedimiento,
-                id_diagnostico,
-                descripcion
-            ]
-        );
+        const [result] = await connection.insert(odontogramaProcedimientos).values({
+            idOdontograma: id_odontograma,
+            idDentista: id_dentista,
+            idPlan: id_plan,
+            idPlanTratamientoProcedimiento: id_plan_tratamiento_procedimiento,
+            idDiagnostico: id_diagnostico,
+            descripcion: descripcion
+        });
 
         return result.insertId; // ← id_odontograma_procedimiento
     },
 
     async findByOdontograma(id_odontograma) {
-        const [rows] = await db.query(`
-        SELECT 
-            op.id_odontograma_procedimiento,
-            op.id_odontograma,
-            op.descripcion,
-            op.fecha_realizacion,
-            op.id_diagnostico,
+        const result = await db.select({
+            id_odontograma_procedimiento: odontogramaProcedimientos.idOdontogramaProcedimiento,
+            id_odontograma: odontogramaProcedimientos.idOdontograma,
+            descripcion: odontogramaProcedimientos.descripcion,
+            fecha_realizacion: odontogramaProcedimientos.fechaRealizacion,
+            id_diagnostico: odontogramaProcedimientos.idDiagnostico,
 
-            -- Catálogo de procedimientos
-            cp.id_catalogo_procedimiento,
-            cp.nombre AS procedimiento_nombre,
-            cp.descripcion AS procedimiento_descripcion,
+            // Catálogo de procedimientos
+            id_catalogo_procedimiento: catalogoProcedimientos.idCatalogoProcedimiento,
+            procedimiento_nombre: catalogoProcedimientos.nombre,
+            procedimiento_descripcion: catalogoProcedimientos.descripcion,
 
-            -- Procedimiento dentro del plan
-            ptp.id_procedimiento AS id_plan_tratamiento_procedimiento,
-            ptp.status AS procedimiento_status,
-            ptp.cantidad AS procedimiento_cantidad,
-            ptp.precio_unitario AS procedimiento_precio_unitario,
+            // Procedimiento dentro del plan
+            id_plan_tratamiento_procedimiento: planTratamientoProcedimientos.idProcedimiento,
+            procedimiento_status: planTratamientoProcedimientos.status,
+            procedimiento_cantidad: planTratamientoProcedimientos.cantidad,
+            procedimiento_precio_unitario: planTratamientoProcedimientos.precioUnitario,
 
-            -- Dentista
-            d.id_dentista,
-            CONCAT(d.nombre, ' ', d.apellido_paterno, ' ', IFNULL(d.apellido_materno, '')) AS dentista_nombre,
+            // Dentista
+            id_dentista: dentistas.idDentista,
+            dentista_nombre: sql`CONCAT(${dentistas.nombre}, ' ', ${dentistas.apellidoPaterno}, ' ', IFNULL(${dentistas.apellidoMaterno}, ''))`,
 
-            -- Plan de tratamiento
-            pt.id_plan,
-            pt.nombre_plan AS plan_tratamiento_nombre
+            // Plan de tratamiento
+            id_plan: planTratamiento.idPlan,
+            plan_tratamiento_nombre: planTratamiento.nombrePlan
+        })
+            .from(odontogramaProcedimientos)
+            .innerJoin(planTratamientoProcedimientos, eq(planTratamientoProcedimientos.idProcedimiento, odontogramaProcedimientos.idPlanTratamientoProcedimiento))
+            .innerJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .innerJoin(dentistas, eq(dentistas.idDentista, odontogramaProcedimientos.idDentista))
+            .innerJoin(planTratamiento, eq(planTratamiento.idPlan, odontogramaProcedimientos.idPlan))
+            .where(eq(odontogramaProcedimientos.idOdontograma, id_odontograma));
 
-        FROM odontograma_procedimientos op
-        INNER JOIN plan_tratamiento_procedimientos ptp
-            ON ptp.id_procedimiento = op.id_plan_tratamiento_procedimiento
-        INNER JOIN catalogo_procedimientos cp
-            ON cp.id_catalogo_procedimiento = ptp.id_catalogo_procedimiento
-        INNER JOIN dentistas d
-            ON d.id_dentista = op.id_dentista
-        INNER JOIN plan_tratamiento pt
-            ON pt.id_plan = op.id_plan
-        WHERE op.id_odontograma = ?
-    `, [id_odontograma]);
-
-        return rows;
+        return result;
     }
 
 };

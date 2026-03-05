@@ -1,201 +1,153 @@
-const db = require('../../config/db');
+const db = require('../../db/index');
+const { eq, sql, inArray, desc } = require('drizzle-orm');
+const {
+    planTratamiento,
+    planTratamientoProcedimientos,
+    catalogoProcedimientos,
+    preciosProcedimientos,
+    pagos
+} = require('../../db/schema');
 
 const Tratamiento = {
 
     async create(data) {
-        const conn = await db.getConnection();
-        try {
-            await conn.beginTransaction();
-
-            const [result] = await conn.execute(
-                `INSERT INTO plan_tratamiento (
-                    id_clinica, id_paciente, id_dentista, nombre_plan, fecha_inicio, 
-                    fecha_fin_estimada, costo_total_inicial, costo_ajustado, razon_ajuste, 
-                    plan_pago, estado
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
-                [
-                    data.id_clinica,
-                    data.id_paciente,
-                    data.id_dentista,
-                    data.nombre_plan ?? null,
-                    data.fecha_inicio ?? null,
-                    data.fecha_fin_estimada ?? null,
-                    data.costo_total_inicial ?? 0,
-                    data.costo_ajustado ?? 0,
-                    data.razon_ajuste ?? null,
-                    data.plan_pago ?? 'Pago único',
-                    data.estado ?? 'En Progreso'
-                ]
-            );
+        return await db.transaction(async (tx) => {
+            const [result] = await tx.insert(planTratamiento).values({
+                idClinica: data.id_clinica,
+                idPaciente: data.id_paciente,
+                idDentista: data.id_dentista,
+                nombrePlan: data.nombre_plan ?? null,
+                fechaInicio: data.fecha_inicio ?? null,
+                fechaFinEstimada: data.fecha_fin_estimada ?? null,
+                costoTotalInicial: data.costo_total_inicial ?? 0,
+                costoAjustado: data.costo_ajustado ?? 0,
+                razonAjuste: data.razon_ajuste ?? null,
+                planPago: data.plan_pago ?? 'Pago único',
+                estado: data.estado ?? 'En Progreso'
+            });
 
             const id_plan = result.insertId;
 
             if (data.procedimientos?.length) {
-                const procedimientos = data.procedimientos.map(p => [
-                    id_plan,
-                    data.id_clinica,
-                    data.id_paciente,
-                    p.id_catalogo_procedimiento,
-                    p.status ?? 'Pendiente',
-                    p.cantidad ?? 1,
-                    p.precio_unitario ?? 0
-                ]);
+                const procedimientosInsert = data.procedimientos.map(p => ({
+                    idPlan: id_plan,
+                    idClinica: data.id_clinica,
+                    idPaciente: data.id_paciente,
+                    idCatalogoProcedimiento: p.id_catalogo_procedimiento,
+                    status: p.status ?? 'Pendiente',
+                    cantidad: p.cantidad ?? 1,
+                    precioUnitario: p.precio_unitario ?? 0
+                }));
 
-                await conn.query(
-                    `INSERT INTO plan_tratamiento_procedimientos 
-                    (id_plan, id_clinica, id_paciente, id_catalogo_procedimiento, status, cantidad, precio_unitario)
-                    VALUES ?`,
-                    [procedimientos]
-                );
+                await tx.insert(planTratamientoProcedimientos).values(procedimientosInsert);
             }
 
-            await conn.commit();
             return id_plan;
-
-        } catch (error) {
-            await conn.rollback();
-            throw error;
-        } finally {
-            conn.release();
-        }
+        });
     },
 
     async findById(id_plan) {
-
-        const [planRows] = await db.execute(
-            `SELECT * FROM plan_tratamiento WHERE id_plan = ?`,
-            [id_plan]
-        );
+        const planRows = await db.select()
+            .from(planTratamiento)
+            .where(eq(planTratamiento.idPlan, id_plan));
 
         if (!planRows.length) return null;
 
         const plan = planRows[0];
 
         // Procedimientos
-        const [procRows] = await db.execute(
-            `
-        SELECT 
-            ptp.id_procedimiento, 
-            ptp.id_plan,
-            ptp.id_catalogo_procedimiento,
-            cp.nombre,
-            cp.descripcion,
-            ptp.status,
-            ptp.cantidad,
-            ptp.precio_unitario,
-            pp.precio AS precio_base
-        FROM plan_tratamiento_procedimientos ptp
-        INNER JOIN catalogo_procedimientos cp
-            ON ptp.id_catalogo_procedimiento = cp.id_catalogo_procedimiento
-        LEFT JOIN precios_procedimientos pp
-            ON cp.id_catalogo_procedimiento = pp.id_catalogo_procedimiento
-        WHERE ptp.id_plan = ?
-        `,
-            [id_plan]
-        );
+        const procRows = await db.select({
+            id_procedimiento: planTratamientoProcedimientos.idProcedimiento,
+            id_plan: planTratamientoProcedimientos.idPlan,
+            id_catalogo_procedimiento: planTratamientoProcedimientos.idCatalogoProcedimiento,
+            nombre: catalogoProcedimientos.nombre,
+            descripcion: catalogoProcedimientos.descripcion,
+            status: planTratamientoProcedimientos.status,
+            cantidad: planTratamientoProcedimientos.cantidad,
+            precio_unitario: planTratamientoProcedimientos.precioUnitario,
+            precio_base: preciosProcedimientos.precio
+        })
+            .from(planTratamientoProcedimientos)
+            .innerJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, catalogoProcedimientos.idCatalogoProcedimiento))
+            .where(eq(planTratamientoProcedimientos.idPlan, id_plan));
 
         plan.procedimientos = procRows;
 
         // Pagos
-        const [pagosRows] = await db.execute(
-            `SELECT IFNULL(SUM(monto), 0) AS total_pagado FROM pagos WHERE id_plan = ?`,
-            [id_plan]
-        );
+        const pagosRows = await db.select({
+            total_pagado: sql`IFNULL(SUM(${pagos.monto}), 0)`.mapWith(Number)
+        })
+            .from(pagos)
+            .where(eq(pagos.idPlan, id_plan));
 
-        plan.total_pagado = pagosRows[0].total_pagado;
+        plan.total_pagado = pagosRows[0]?.total_pagado || 0;
 
         return plan;
     },
 
     async findByPaciente(id_paciente) {
-
-        const [plans] = await db.execute(
-            `
-        SELECT *
-        FROM plan_tratamiento
-        WHERE id_paciente = ?
-        ORDER BY fecha_inicio DESC
-        `,
-            [id_paciente]
-        );
+        const plans = await db.select()
+            .from(planTratamiento)
+            .where(eq(planTratamiento.idPaciente, id_paciente))
+            .orderBy(desc(planTratamiento.fechaInicio));
 
         if (!plans.length) return [];
 
-        const ids = plans.map(p => p.id_plan);
+        const ids = plans.map(p => p.idPlan);
 
-        const [procedimientos] = await db.query(
-            `
-        SELECT 
-            ptp.id_procedimiento, 
-            ptp.id_plan,
-            ptp.id_catalogo_procedimiento,
-            cp.nombre,
-            cp.descripcion,
-            ptp.status,
-            ptp.cantidad,
-            ptp.precio_unitario,
-            pp.precio AS precio_base
-        FROM plan_tratamiento_procedimientos ptp
-        INNER JOIN catalogo_procedimientos cp
-            ON ptp.id_catalogo_procedimiento = cp.id_catalogo_procedimiento
-        LEFT JOIN precios_procedimientos pp
-            ON cp.id_catalogo_procedimiento = pp.id_catalogo_procedimiento
-        WHERE ptp.id_plan IN (?)
-        `,
-            [ids]
-        );
+        const procedimientosResult = await db.select({
+            id_procedimiento: planTratamientoProcedimientos.idProcedimiento,
+            id_plan: planTratamientoProcedimientos.idPlan,
+            id_catalogo_procedimiento: planTratamientoProcedimientos.idCatalogoProcedimiento,
+            nombre: catalogoProcedimientos.nombre,
+            descripcion: catalogoProcedimientos.descripcion,
+            status: planTratamientoProcedimientos.status,
+            cantidad: planTratamientoProcedimientos.cantidad,
+            precio_unitario: planTratamientoProcedimientos.precioUnitario,
+            precio_base: preciosProcedimientos.precio
+        })
+            .from(planTratamientoProcedimientos)
+            .innerJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, catalogoProcedimientos.idCatalogoProcedimiento))
+            .where(inArray(planTratamientoProcedimientos.idPlan, ids));
 
-        const [pagos] = await db.query(
-            `SELECT id_plan, IFNULL(SUM(monto), 0) AS total_pagado
-         FROM pagos
-         WHERE id_plan IN (?)
-         GROUP BY id_plan`,
-            [ids]
-        );
+        const pagosResult = await db.select({
+            id_plan: pagos.idPlan,
+            total_pagado: sql`IFNULL(SUM(${pagos.monto}), 0)`.mapWith(Number)
+        })
+            .from(pagos)
+            .where(inArray(pagos.idPlan, ids))
+            .groupBy(pagos.idPlan);
 
         return plans.map(plan => ({
             ...plan,
-            procedimientos: procedimientos.filter(p => p.id_plan === plan.id_plan),
-            total_pagado: pagos.find(p => p.id_plan === plan.id_plan)?.total_pagado || 0
+            id_plan: plan.idPlan, // map camelcase to original property format
+            procedimientos: procedimientosResult.filter(p => p.id_plan === plan.idPlan),
+            total_pagado: pagosResult.find(p => p.id_plan === plan.idPlan)?.total_pagado || 0
         }));
     },
 
     async update(id_plan, data) {
-        const [result] = await db.execute(
-            `
-      UPDATE plan_tratamiento
-      SET
-        nombre_plan = ?,
-        fecha_inicio = ?,
-        fecha_fin_estimada = ?,
-        costo_total_inicial = ?,
-        costo_ajustado = ?,
-        razon_ajuste = ?,
-        plan_pago = ?,
-        estado = ?
-      WHERE id_plan = ?
-      `,
-            [
-                data.nombre_plan ?? null,
-                data.fecha_inicio ?? null,
-                data.fecha_fin_estimada ?? null,
-                data.costo_total_inicial ?? 0,
-                data.costo_ajustado ?? 0,
-                data.razon_ajuste ?? null,
-                data.plan_pago ?? 'Pago único',
-                data.estado ?? 'En Progreso',
-                id_plan
-            ]
-        );
+        const [result] = await db.update(planTratamiento).set({
+            nombrePlan: data.nombre_plan ?? null,
+            fechaInicio: data.fecha_inicio ?? null,
+            fechaFinEstimada: data.fecha_fin_estimada ?? null,
+            costoTotalInicial: data.costo_total_inicial ?? 0,
+            costoAjustado: data.costo_ajustado ?? 0,
+            razonAjuste: data.razon_ajuste ?? null,
+            planPago: data.plan_pago ?? 'Pago único',
+            estado: data.estado ?? 'En Progreso'
+        })
+            .where(eq(planTratamiento.idPlan, id_plan));
 
         return result.affectedRows;
     },
 
     async delete(id_plan) {
-        const [result] = await db.execute(
-            `DELETE FROM plan_tratamiento WHERE id_plan = ?`,
-            [id_plan]
-        );
+        const [result] = await db.delete(planTratamiento)
+            .where(eq(planTratamiento.idPlan, id_plan));
+
         return result.affectedRows;
     }
 

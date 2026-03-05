@@ -1,53 +1,63 @@
-const db = require('../../config/db');
+const db = require('../../db/index');
+const { eq } = require('drizzle-orm');
+const { catalogoDiagnosticos } = require('../../db/schema');
 
 const CatalogoDiagnosticosModel = {
 
-    findAll: async () => {
-        const [rows] = await db.query(`
-      SELECT * FROM catalogo_diagnosticos 
-    `);
-        return rows;
-    },
+  findAll: async () => {
+    const result = await db.select({
+      id_diagnostico: catalogoDiagnosticos.idDiagnostico,
+      nombre: catalogoDiagnosticos.nombre,
+      tipo: catalogoDiagnosticos.tipo,
+      color_icon: catalogoDiagnosticos.colorIcon,
+      simbolo: catalogoDiagnosticos.simbolo
+    }).from(catalogoDiagnosticos);
+    return result;
+  },
 
-    findById: async (id) => {
-        const [rows] = await db.query(`
-      SELECT * FROM catalogo_diagnosticos
-      WHERE id_diagnostico = ?
-    `, [id]);
-        return rows[0];
-    },
+  findById: async (id) => {
+    const result = await db.select({
+      id_diagnostico: catalogoDiagnosticos.idDiagnostico,
+      nombre: catalogoDiagnosticos.nombre,
+      tipo: catalogoDiagnosticos.tipo,
+      color_icon: catalogoDiagnosticos.colorIcon,
+      simbolo: catalogoDiagnosticos.simbolo
+    }).from(catalogoDiagnosticos).where(eq(catalogoDiagnosticos.idDiagnostico, id));
+    return result[0];
+  },
 
-    create: async (data) => {
-        const { nombre, tipo, color_icon, simbolo } = data;
+  create: async (data) => {
+    const { nombre, tipo, color_icon, simbolo } = data;
 
-        const [result] = await db.query(`
-      INSERT INTO catalogo_diagnosticos (nombre, tipo, color_icon, simbolo)
-      VALUES (?, ?, ?, ?)
-    `, [nombre, tipo, color_icon, simbolo]);
+    const [result] = await db.insert(catalogoDiagnosticos).values({
+      nombre: nombre,
+      tipo: tipo,
+      colorIcon: color_icon,
+      simbolo: simbolo
+    });
 
-        return result.insertId;
-    },
+    return result.insertId;
+  },
 
-    update: async (id, data) => {
-        const { nombre, tipo, color_icon, simbolo } = data;
+  update: async (id, data) => {
+    const { nombre, tipo, color_icon, simbolo } = data;
 
-        await db.query(`
-      UPDATE catalogo_diagnosticos
-      SET nombre = ?, tipo = ?, color_icon = ?, simbolo = ?
-      WHERE id_diagnostico = ?
-    `, [nombre, tipo, color_icon, simbolo, id]);
+    await db.update(catalogoDiagnosticos)
+      .set({
+        nombre: nombre,
+        tipo: tipo,
+        colorIcon: color_icon,
+        simbolo: simbolo
+      })
+      .where(eq(catalogoDiagnosticos.idDiagnostico, id));
 
-        return true;
-    },
+    return true;
+  },
 
-    remove: async (id) => {
-        await db.query(`
-      DELETE FROM catalogo_diagnosticos
-      WHERE id_diagnostico = ?
-    `, [id]);
-
-        return true;
-    }
+  remove: async (id) => {
+    await db.delete(catalogoDiagnosticos).where(eq(catalogoDiagnosticos.idDiagnostico, id));
+    return true;
+  }
 };
 
 module.exports = CatalogoDiagnosticosModel;

@@ -1,42 +1,32 @@
-const db = require("../../../config/db");
+const db = require('../../../db/index');
+const { eq, sql, desc, asc } = require('drizzle-orm');
+const { planTratamiento, pacientes, cuotasTratamiento } = require('../../../db/schema');
 
 const PlanesPagoModel = {
   async findByClinica(id_clinica) {
-    const [rows] = await db.query(
-      `
-      SELECT
-        pt.id_plan,
-        pt.nombre_plan,
-        pt.fecha_inicio,
-        pt.costo_ajustado,
-        pt.estado,
-        pt.plan_pago,
-        pt.id_paciente,
-        CONCAT(
-          p.nombre, ' ',
-          p.apellido_paterno, ' ',
-          p.apellido_materno
-        ) AS paciente,
-        p.telefono,
-        p.correo,
-        ct.id_cuota,
-        ct.monto,
-        ct.fecha_programada,
-        ct.pagada
-      FROM plan_tratamiento pt
-      JOIN pacientes p 
-        ON p.id_paciente = pt.id_paciente
-      LEFT JOIN cuotas_tratamiento ct 
-        ON ct.id_plan = pt.id_plan
-      WHERE pt.id_clinica = ?
-      ORDER BY 
-        pt.fecha_inicio DESC, 
-        ct.fecha_programada ASC
-      `,
-      [id_clinica]
-    );
+    const result = await db.select({
+      id_plan: planTratamiento.idPlan,
+      nombre_plan: planTratamiento.nombrePlan,
+      fecha_inicio: planTratamiento.fechaInicio,
+      costo_ajustado: planTratamiento.costoAjustado,
+      estado: planTratamiento.estado,
+      plan_pago: planTratamiento.planPago,
+      id_paciente: planTratamiento.idPaciente,
+      paciente: sql`CONCAT(${pacientes.nombre}, ' ', ${pacientes.apellidoPaterno}, ' ', IFNULL(${pacientes.apellidoMaterno}, ''))`,
+      telefono: pacientes.telefono,
+      correo: pacientes.correo,
+      id_cuota: cuotasTratamiento.idCuota,
+      monto: cuotasTratamiento.monto,
+      fecha_programada: cuotasTratamiento.fechaProgramada,
+      pagada: cuotasTratamiento.pagada
+    })
+      .from(planTratamiento)
+      .innerJoin(pacientes, eq(pacientes.idPaciente, planTratamiento.idPaciente))
+      .leftJoin(cuotasTratamiento, eq(cuotasTratamiento.idPlan, planTratamiento.idPlan))
+      .where(eq(planTratamiento.idClinica, id_clinica))
+      .orderBy(desc(planTratamiento.fechaInicio), asc(cuotasTratamiento.fechaProgramada));
 
-    return rows;
+    return result;
   },
 };
 

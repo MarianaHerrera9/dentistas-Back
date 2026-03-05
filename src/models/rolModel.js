@@ -1,21 +1,26 @@
-const db = require('../config/db');
+const db = require('../db/index');
+const { eq } = require('drizzle-orm');
+const { roles } = require('../db/schema');
 
 const Rol = {
   async getAllForClinica(id_clinica) {
-    const [rows] = await db.execute(
-      `SELECT id_rol, nombre_rol, descripcion 
-       FROM roles `,
-      [id_clinica]
-    );
-    console.log("Roles desde DB:", rows);
-    return rows;
+    const result = await db
+      .select({
+        id_rol: roles.idRol,
+        nombre_rol: roles.nombreRol,
+        descripcion: roles.descripcion
+      })
+      .from(roles)
+      .where(eq(roles.idClinica, id_clinica));
+    return result;
   },
+
   async create(data) {
-    const [result] = await db.execute(
-      `INSERT INTO roles (id_clinica, nombre_rol, descripcion)
-       VALUES (?, ?, ?)`,
-      [data.id_clinica, data.nombre_rol, data.descripcion]
-    );
+    const [result] = await db.insert(roles).values({
+      idClinica: data.id_clinica,
+      nombreRol: data.nombre_rol,
+      descripcion: data.descripcion
+    });
     return result.insertId;
   }
 };

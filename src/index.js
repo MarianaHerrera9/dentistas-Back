@@ -27,6 +27,7 @@ const movimientosProductosRoutes = require('./modules/inventario/movimientos_pro
 const rolesRoutes = require('./routes/rolesRoutes'); 
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const archivosRoutes = require("./modules/archivos/archivosRoutes");
+const periodontogramasRoutes = require('./modules/periodontogramas/periodontogramasRoutes');
 const app = express();
 
 app.use(
@@ -72,6 +73,7 @@ app.use('/configuracionClinica', ConfiguracionClinica);
 app.use('/movimientos-productos', movimientosProductosRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/usuarios', usuariosRoutes);
+app.use('/periodontogramas', periodontogramasRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
 app.use('/uploads', cors(corsOptions), express.static('uploads'));
 app.use("/api/archivos", archivosRoutes);

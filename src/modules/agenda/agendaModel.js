@@ -1,47 +1,57 @@
-const db = require('../../config/db');
+const db = require('../../db/index');
+const { eq, and } = require('drizzle-orm');
+const { bloquesDisponibilidad } = require('../../db/schema');
 
 const AgendaModel = {
 
-    createBlock(data) {
-        return db.execute(
-            `INSERT INTO bloques_disponibilidad
-       (id_clinica, dia_semana, hora_inicio, hora_fin)
-       VALUES (?, ?, ?, ?)`,
-            [
-                data.id_clinica,
-                data.dia_semana,
-                data.hora_inicio,
-                data.hora_fin
-            ]
-        );
+    async createBlock(data) {
+        const [result] = await db.insert(bloquesDisponibilidad).values({
+            idClinica: data.id_clinica,
+            diaSemana: data.dia_semana,
+            horaInicio: data.hora_inicio,
+            horaFin: data.hora_fin
+        });
+        return [result];
     },
 
-    getBlocksByClinic(id_clinica) {
-        return db.execute(
-            `SELECT *
-       FROM bloques_disponibilidad
-       WHERE id_clinica = ? AND activo = TRUE
-       ORDER BY dia_semana, hora_inicio`,
-            [id_clinica]
-        );
+    async getBlocksByClinic(id_clinica) {
+        const result = await db
+            .select({
+                id_bloque: bloquesDisponibilidad.idBloque,
+                id_clinica: bloquesDisponibilidad.idClinica,
+                dia_semana: bloquesDisponibilidad.diaSemana,
+                hora_inicio: bloquesDisponibilidad.horaInicio,
+                hora_fin: bloquesDisponibilidad.horaFin,
+                activo: bloquesDisponibilidad.activo
+            })
+            .from(bloquesDisponibilidad)
+            .where(
+                and(
+                    eq(bloquesDisponibilidad.idClinica, id_clinica),
+                    eq(bloquesDisponibilidad.activo, 1)
+                )
+            )
+            .orderBy(bloquesDisponibilidad.diaSemana, bloquesDisponibilidad.horaInicio);
+        return [result];
     },
 
-    updateBlock(id_bloque, data) {
-        return db.execute(
-            `UPDATE bloques_disponibilidad
-       SET hora_inicio = ?, hora_fin = ?
-       WHERE id_bloque = ?`,
-            [data.hora_inicio, data.hora_fin, id_bloque]
-        );
+    async updateBlock(id_bloque, data) {
+        const [result] = await db
+            .update(bloquesDisponibilidad)
+            .set({
+                horaInicio: data.hora_inicio,
+                horaFin: data.hora_fin
+            })
+            .where(eq(bloquesDisponibilidad.idBloque, id_bloque));
+        return [result];
     },
 
-    softDeleteBlock(id_bloque) {
-        return db.execute(
-            `UPDATE bloques_disponibilidad
-       SET activo = FALSE
-       WHERE id_bloque = ?`,
-            [id_bloque]
-        );
+    async softDeleteBlock(id_bloque) {
+        const [result] = await db
+            .update(bloquesDisponibilidad)
+            .set({ activo: 0 })
+            .where(eq(bloquesDisponibilidad.idBloque, id_bloque));
+        return [result];
     }
 
 };

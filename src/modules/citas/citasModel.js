@@ -1,137 +1,192 @@
-const db = require('../../config/db');
+const db = require('../../db/index');
+const { eq, and, between, sql, asc, desc, or } = require('drizzle-orm');
+const { citas, pacientes, dentistas, catalogoProcedimientos, clinicas } = require('../../db/schema');
 
 const CitasModel = {
-    create(data) {
-        return db.execute(
-            `INSERT INTO citas (
-                id_clinica,
-                id_paciente,
-                id_dentista,
-                fecha_cita,
-                hora_inicio,
-                hora_fin,
-                id_procedimiento,
-                notas,
-                estado,
-                creado_por
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente', ?)`,
-            [
-                data.id_clinica,
-                data.id_paciente,
-                data.id_dentista,
-                data.fecha_cita,
-                data.hora_inicio,
-                data.hora_fin,
-                data.id_procedimiento,
-                data.notas,
-                data.creado_por
-            ]
-        );
+    async create(data) {
+        const [result] = await db.insert(citas).values({
+            idClinica: data.id_clinica,
+            idPaciente: data.id_paciente,
+            idDentista: data.id_dentista,
+            fechaCita: data.fecha_cita,
+            horaInicio: data.hora_inicio,
+            horaFin: data.hora_fin,
+            idProcedimiento: data.id_procedimiento,
+            notas: data.notas,
+            estado: 'Pendiente',
+            creadoPor: data.creado_por
+        });
+        return [result];
     },
 
-    getByDate(id_clinica, fecha) {
-        return db.execute(
-            `SELECT c.*,
-                p.nombre AS paciente,
-                d.nombre AS dentista,
-                cp.id_catalogo_procedimiento AS procedimiento_id,
-                cp.nombre AS procedimiento_nombre,
-                cp.color AS procedimiento_color
-            FROM citas c
-            JOIN pacientes p ON p.id_paciente = c.id_paciente
-            JOIN dentistas d ON d.id_dentista = c.id_dentista
-            LEFT JOIN catalogo_procedimientos cp
-                ON cp.id_catalogo_procedimiento = c.id_procedimiento
-            WHERE c.id_clinica = ?
-                AND c.fecha_cita = ?
-            ORDER BY c.hora_inicio`,
-            [id_clinica, fecha]
-        );
+    async getByDate(id_clinica, fecha) {
+        const result = await db.select({
+            id_cita: citas.idCita,
+            id_clinica: citas.idClinica,
+            id_paciente: citas.idPaciente,
+            id_dentista: citas.idDentista,
+            fecha_cita: citas.fechaCita,
+            hora_inicio: citas.horaInicio,
+            hora_fin: citas.horaFin,
+            id_procedimiento: citas.idProcedimiento,
+            notas: citas.notas,
+            estado: citas.estado,
+            creado_por: citas.creadoPor,
+            fecha_creacion: citas.fechaCreacion,
+            paciente: pacientes.nombre,
+            dentista: dentistas.nombre,
+            procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
+            procedimiento_nombre: catalogoProcedimientos.nombre,
+            procedimiento_color: catalogoProcedimientos.color
+        })
+            .from(citas)
+            .innerJoin(pacientes, eq(pacientes.idPaciente, citas.idPaciente))
+            .innerJoin(dentistas, eq(dentistas.idDentista, citas.idDentista))
+            .leftJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, citas.idProcedimiento))
+            .where(
+                and(
+                    eq(citas.idClinica, id_clinica),
+                    eq(citas.fechaCita, fecha)
+                )
+            )
+            .orderBy(citas.horaInicio);
+
+        return [result];
     },
 
-    getByWeek(id_clinica, start_date, end_date) {
-        return db.execute(
-            `SELECT c.*,
-                p.nombre AS paciente,
-                d.nombre AS dentista,
-                cp.id_catalogo_procedimiento AS procedimiento_id,
-                cp.nombre AS procedimiento_nombre,
-                cp.color AS procedimiento_color
-            FROM citas c
-            JOIN pacientes p ON p.id_paciente = c.id_paciente
-            JOIN dentistas d ON d.id_dentista = c.id_dentista
-            LEFT JOIN catalogo_procedimientos cp
-                 ON cp.id_catalogo_procedimiento = c.id_procedimiento
-            WHERE c.id_clinica = ?
-                AND c.fecha_cita BETWEEN ? AND ?
-            ORDER BY c.fecha_cita, c.hora_inicio;`,
-            [id_clinica, start_date, end_date]
-        );
+    async getByWeek(id_clinica, start_date, end_date) {
+        const result = await db.select({
+            id_cita: citas.idCita,
+            id_clinica: citas.idClinica,
+            id_paciente: citas.idPaciente,
+            id_dentista: citas.idDentista,
+            fecha_cita: citas.fechaCita,
+            hora_inicio: citas.horaInicio,
+            hora_fin: citas.horaFin,
+            id_procedimiento: citas.idProcedimiento,
+            notas: citas.notas,
+            estado: citas.estado,
+            creado_por: citas.creadoPor,
+            fecha_creacion: citas.fechaCreacion,
+            paciente: pacientes.nombre,
+            dentista: dentistas.nombre,
+            procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
+            procedimiento_nombre: catalogoProcedimientos.nombre,
+            procedimiento_color: catalogoProcedimientos.color
+        })
+            .from(citas)
+            .innerJoin(pacientes, eq(pacientes.idPaciente, citas.idPaciente))
+            .innerJoin(dentistas, eq(dentistas.idDentista, citas.idDentista))
+            .leftJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, citas.idProcedimiento))
+            .where(
+                and(
+                    eq(citas.idClinica, id_clinica),
+                    between(citas.fechaCita, start_date, end_date)
+                )
+            )
+            .orderBy(asc(citas.fechaCita), asc(citas.horaInicio));
+
+        return [result];
     },
 
-    getByMonth(id_clinica, year, month) {
-        return db.execute(
-            `SELECT c.*,
-                p.nombre AS paciente,
-                d.nombre AS dentista,
-                cp.id_catalogo_procedimiento AS procedimiento_id,
-                cp.nombre AS procedimiento_nombre,
-                cp.color AS procedimiento_color
-            FROM citas c
-            JOIN pacientes p ON p.id_paciente = c.id_paciente
-            JOIN dentistas d ON d.id_dentista = c.id_dentista
-            LEFT JOIN catalogo_procedimientos cp
-                ON cp.id_catalogo_procedimiento = c.id_procedimiento
-            WHERE c.id_clinica = ?
-                AND YEAR(c.fecha_cita) = ?
-                AND MONTH(c.fecha_cita) = ?
-            ORDER BY c.fecha_cita, c.hora_inicio;`,
-            [id_clinica, year, month]
-        );
+    async getByMonth(id_clinica, year, month) {
+        const result = await db.select({
+            id_cita: citas.idCita,
+            id_clinica: citas.idClinica,
+            id_paciente: citas.idPaciente,
+            id_dentista: citas.idDentista,
+            fecha_cita: citas.fechaCita,
+            hora_inicio: citas.horaInicio,
+            hora_fin: citas.horaFin,
+            id_procedimiento: citas.idProcedimiento,
+            notas: citas.notas,
+            estado: citas.estado,
+            creado_por: citas.creadoPor,
+            fecha_creacion: citas.fechaCreacion,
+            paciente: pacientes.nombre,
+            dentista: dentistas.nombre,
+            procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
+            procedimiento_nombre: catalogoProcedimientos.nombre,
+            procedimiento_color: catalogoProcedimientos.color
+        })
+            .from(citas)
+            .innerJoin(pacientes, eq(pacientes.idPaciente, citas.idPaciente))
+            .innerJoin(dentistas, eq(dentistas.idDentista, citas.idDentista))
+            .leftJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, citas.idProcedimiento))
+            .where(
+                and(
+                    eq(citas.idClinica, id_clinica),
+                    sql`YEAR(${citas.fechaCita}) = ${year}`,
+                    sql`MONTH(${citas.fechaCita}) = ${month}`
+                )
+            )
+            .orderBy(asc(citas.fechaCita), asc(citas.horaInicio));
+
+        return [result];
     },
 
-    hasOverlap({ id_dentista, fecha_cita, hora_inicio, hora_fin }) {
-        return db.execute(
-            `SELECT COUNT(*) total
-             FROM citas
-             WHERE id_dentista = ?
-               AND fecha_cita = ?
-               AND estado IN ('Pendiente','Confirmada')
-               AND (hora_inicio < ? AND hora_fin > ?)`,
-            [id_dentista, fecha_cita, hora_fin, hora_inicio]
-        );
+    async hasOverlap({ id_dentista, fecha_cita, hora_inicio, hora_fin }) {
+        const result = await db.select({
+            total: sql`COUNT(*)`.mapWith(Number)
+        })
+            .from(citas)
+            .where(
+                and(
+                    eq(citas.idDentista, id_dentista),
+                    eq(citas.fechaCita, fecha_cita),
+                    or(eq(citas.estado, 'Pendiente'), eq(citas.estado, 'Confirmada')),
+                    and(
+                        sql`${citas.horaInicio} < ${hora_fin}`,
+                        sql`${citas.horaFin} > ${hora_inicio}`
+                    )
+                )
+            );
+        return [result];
     },
 
-    updateStatus(id_cita, estado) {
-        return db.execute(
-            `UPDATE citas SET estado = ? WHERE id_cita = ?`,
-            [estado, id_cita]
-        );
+    async updateStatus(id_cita, estado) {
+        const [result] = await db.update(citas)
+            .set({ estado })
+            .where(eq(citas.idCita, id_cita));
+        return [result];
     },
 
-    update(id_cita, data) {
-        return db.execute(
-            `UPDATE citas
-             SET fecha_cita = ?, hora_inicio = ?, hora_fin = ?
-             WHERE id_cita = ?`,
-            [data.fecha_cita, data.hora_inicio, data.hora_fin, id_cita]
-        );
+    async update(id_cita, data) {
+        const [result] = await db.update(citas)
+            .set({
+                fechaCita: data.fecha_cita,
+                horaInicio: data.hora_inicio,
+                horaFin: data.hora_fin
+            })
+            .where(eq(citas.idCita, id_cita));
+        return [result];
     },
 
-    getByPaciente(id_paciente) {
-        return db.execute(
-            `SELECT c.*,
-                cl.nombre AS clinica,
-                d.nombre AS dentista
-         FROM citas c
-         JOIN clinicas cl ON cl.id_clinica = c.id_clinica
-         JOIN dentistas d ON d.id_dentista = c.id_dentista
-         WHERE c.id_paciente = ?
-         ORDER BY c.fecha_cita DESC, c.hora_inicio DESC`,
-            [id_paciente]
-        );
-    },
+    async getByPaciente(id_paciente) {
+        const result = await db.select({
+            id_cita: citas.idCita,
+            id_clinica: citas.idClinica,
+            id_paciente: citas.idPaciente,
+            id_dentista: citas.idDentista,
+            fecha_cita: citas.fechaCita,
+            hora_inicio: citas.horaInicio,
+            hora_fin: citas.horaFin,
+            id_procedimiento: citas.idProcedimiento,
+            notas: citas.notas,
+            estado: citas.estado,
+            creado_por: citas.creadoPor,
+            fecha_creacion: citas.fechaCreacion,
+            clinica: clinicas.nombre,
+            dentista: dentistas.nombre
+        })
+            .from(citas)
+            .innerJoin(clinicas, eq(clinicas.idClinica, citas.idClinica))
+            .innerJoin(dentistas, eq(dentistas.idDentista, citas.idDentista))
+            .where(eq(citas.idPaciente, id_paciente))
+            .orderBy(desc(citas.fechaCita), desc(citas.horaInicio));
 
+        return [result];
+    }
 };
 
 module.exports = CitasModel;
