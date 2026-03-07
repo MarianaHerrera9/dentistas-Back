@@ -32,7 +32,7 @@ const CitasModel = {
             notas: citas.notas,
             estado: citas.estado,
             creado_por: citas.creadoPor,
-            fecha_creacion: citas.fechaCreacion,
+
             paciente: pacientes.nombre,
             dentista: dentistas.nombre,
             procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
@@ -67,7 +67,7 @@ const CitasModel = {
             notas: citas.notas,
             estado: citas.estado,
             creado_por: citas.creadoPor,
-            fecha_creacion: citas.fechaCreacion,
+
             paciente: pacientes.nombre,
             dentista: dentistas.nombre,
             procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
@@ -102,7 +102,7 @@ const CitasModel = {
             notas: citas.notas,
             estado: citas.estado,
             creado_por: citas.creadoPor,
-            fecha_creacion: citas.fechaCreacion,
+
             paciente: pacientes.nombre,
             dentista: dentistas.nombre,
             procedimiento_id: catalogoProcedimientos.idCatalogoProcedimiento,
@@ -175,7 +175,7 @@ const CitasModel = {
             notas: citas.notas,
             estado: citas.estado,
             creado_por: citas.creadoPor,
-            fecha_creacion: citas.fechaCreacion,
+
             clinica: clinicas.nombre,
             dentista: dentistas.nombre
         })

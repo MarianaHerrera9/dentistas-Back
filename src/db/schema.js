@@ -21,6 +21,7 @@ __export(schema_exports, {
   antecedentes: () => antecedentes,
   archivosClinicas: () => archivosClinicas,
   auditoria: () => auditoria,
+  ausenciasDentistas: () => ausenciasDentistas,
   bloquesDisponibilidad: () => bloquesDisponibilidad,
   catalogoDiagnosticos: () => catalogoDiagnosticos,
   catalogoProcedimientos: () => catalogoProcedimientos,
@@ -61,6 +62,29 @@ __export(schema_exports, {
 module.exports = __toCommonJS(schema_exports);
 var import_mysql_core = require("drizzle-orm/mysql-core");
 var import_drizzle_orm = require("drizzle-orm");
+const ausenciasDentistas = (0, import_mysql_core.mysqlTable)(
+  "ausencias_dentistas",
+  {
+    idAusencia: (0, import_mysql_core.int)("id_ausencia").autoincrement().notNull(),
+    idClinica: (0, import_mysql_core.int)("id_clinica").notNull().references(() => clinicas.idClinica, { onDelete: "cascade" }),
+    idDentista: (0, import_mysql_core.int)("id_dentista").notNull().references(() => dentistas.idDentista, { onDelete: "cascade" }),
+    tipo: (0, import_mysql_core.mysqlEnum)("tipo", ["vacaciones", "no_disponibilidad"]).notNull(),
+    fechaInicio: (0, import_mysql_core.date)("fecha_inicio", { mode: "string" }).notNull(),
+    fechaFin: (0, import_mysql_core.date)("fecha_fin", { mode: "string" }).notNull(),
+    horaInicio: (0, import_mysql_core.time)("hora_inicio"),
+    horaFin: (0, import_mysql_core.time)("hora_fin"),
+    motivo: (0, import_mysql_core.varchar)({ length: 255 }),
+    creadoPor: (0, import_mysql_core.int)("creado_por").references(() => usuariosLogin.idUsuario, { onDelete: "set null" }),
+    createdAt: (0, import_mysql_core.timestamp)("created_at", { mode: "string" }).defaultNow(),
+    updatedAt: (0, import_mysql_core.timestamp)("updated_at", { mode: "string" }).defaultNow().onUpdateNow()
+  },
+  (table) => [
+    (0, import_mysql_core.index)("idx_ausencias_dentista").on(table.idDentista),
+    (0, import_mysql_core.index)("idx_ausencias_clinica").on(table.idClinica),
+    (0, import_mysql_core.index)("idx_ausencias_fechas").on(table.idDentista, table.fechaInicio, table.fechaFin),
+    (0, import_mysql_core.primaryKey)({ columns: [table.idAusencia], name: "ausencias_dentistas_id_ausencia" })
+  ]
+);
 const adminsSaas = (0, import_mysql_core.mysqlTable)(
   "admins_saas",
   {
@@ -413,7 +437,7 @@ const odontogramaProcedimientos = (0, import_mysql_core.mysqlTable)(
     idDentista: (0, import_mysql_core.int)("id_dentista").notNull().references(() => dentistas.idDentista),
     idPlan: (0, import_mysql_core.int)("id_plan").notNull().references(() => planTratamiento.idPlan),
     idPlanTratamientoProcedimiento: (0, import_mysql_core.int)("id_plan_tratamiento_procedimiento").notNull().references(() => planTratamientoProcedimientos.idProcedimiento),
-    descripcion: (0, import_mysql_core.varchar)({ length: 255 }),
+    descripcion: (0, import_mysql_core.varchar)("descripcion", { length: 255 }),
     fechaRealizacion: (0, import_mysql_core.datetime)("fecha_realizacion", { mode: "string" }).default(import_drizzle_orm.sql`(CURRENT_TIMESTAMP)`),
     idDiagnostico: (0, import_mysql_core.int)("id_diagnostico").notNull()
   },
@@ -484,7 +508,8 @@ const pacientes = (0, import_mysql_core.mysqlTable)(
     requiereTutor: (0, import_mysql_core.tinyint)("requiere_tutor").default(0),
     nombreTutor: (0, import_mysql_core.varchar)("nombre_tutor", { length: 200 }),
     telefonoTutor: (0, import_mysql_core.varchar)("telefono_tutor", { length: 15 }),
-    status: (0, import_mysql_core.mysqlEnum)(["draft", "completed"]).default("draft")
+    status: (0, import_mysql_core.mysqlEnum)(["draft", "completed"]).default("draft"),
+    canalAdquisicion: (0, import_mysql_core.varchar)("canal_adquisicion", { length: 100 })
   },
   (table) => [
     (0, import_mysql_core.index)("id_clinica").on(table.idClinica),
@@ -742,3 +767,47 @@ const usuariosLogin = (0, import_mysql_core.mysqlTable)(
     (0, import_mysql_core.unique)("uq_usuarios_login").on(table.usuario, table.idClinica)
   ]
 );
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  adminsSaas,
+  antecedentes,
+  archivosClinicas,
+  auditoria,
+  ausenciasDentistas,
+  bloquesDisponibilidad,
+  catalogoDiagnosticos,
+  catalogoProcedimientos,
+  citas,
+  clinicas,
+  configuracionClinica,
+  consultas,
+  cuotasTratamiento,
+  datosFacturacion,
+  dentistas,
+  examenClinicoInicialExtraoral,
+  examenClinicoInicialIntraoral,
+  lotesProductos,
+  materialesUsados,
+  movimientosInventario,
+  odontogramaDiagnosticos,
+  odontogramaProcedimientos,
+  odontogramaVersiones,
+  odontogramas,
+  pacienteAtributosExtra,
+  pacientes,
+  pacientesLogin,
+  pagos,
+  periodontogramaDetalles,
+  periodontogramas,
+  permisos,
+  planTratamiento,
+  planTratamientoProcedimientos,
+  preciosProcedimientos,
+  productos,
+  recibos,
+  rolPermiso,
+  roles,
+  stockActual,
+  tipoAntecedente,
+  usuariosLogin
+});

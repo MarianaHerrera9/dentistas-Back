@@ -15,12 +15,27 @@ const OdontogramaDiagnostico = {
             otro
         } = data;
 
+        const mapSuperficie = {
+            'Oclusal': 'O',
+            'Mesial': 'M',
+            'Distal': 'D',
+            'Vestibular': 'V',
+            'Lingual': 'L',
+            'Incisal': 'I',
+            'Palatino': 'P'
+        };
+
+        let dbSuperficie = null;
+        if (superficie) {
+            dbSuperficie = mapSuperficie[superficie] || superficie.charAt(0).toUpperCase();
+        }
+
         await db.insert(odontogramaDiagnosticos).values({
             idOdontograma: id_odontograma,
             idCatalogoDiagnostico: id_catalogo_diagnostico,
             numeroDiente: numero_diente,
             tipoAfectacion: tipo_afectacion,
-            superficie: superficie || null,
+            superficie: dbSuperficie,
             numeroRaiz: numero_raiz || null,
             observaciones: observaciones,
             otro: otro
@@ -36,9 +51,7 @@ const OdontogramaDiagnostico = {
             numero_raiz: odontogramaDiagnosticos.numeroRaiz,
             observaciones: odontogramaDiagnosticos.observaciones,
             otro: odontogramaDiagnosticos.otro,
-            fecha_actualizacion: odontogramaDiagnosticos.fechaActualizacion,
             nombre: catalogoDiagnosticos.nombre,
-            tipo_diagnostico: catalogoDiagnosticos.tipo,
             color_icon: catalogoDiagnosticos.colorIcon,
             simbolo: catalogoDiagnosticos.simbolo
         })

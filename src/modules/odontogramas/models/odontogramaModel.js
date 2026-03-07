@@ -24,7 +24,6 @@ const Odontograma = {
             version: odontogramas.version,
             estado: odontogramas.estado,
             fecha_creacion: odontogramas.fechaCreacion,
-            fecha_actualizacion: odontogramas.fechaActualizacion,
             nota_cierre: odontogramas.notaCierre
         })
             .from(odontogramas)
@@ -41,7 +40,6 @@ const Odontograma = {
             version: odontogramas.version,
             estado: odontogramas.estado,
             fecha_creacion: odontogramas.fechaCreacion,
-            fecha_actualizacion: odontogramas.fechaActualizacion,
             nota_cierre: odontogramas.notaCierre
         })
             .from(odontogramas)
