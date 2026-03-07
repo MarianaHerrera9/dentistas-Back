@@ -19,7 +19,8 @@ const pCols = {
   nombre_tutor: pacientes.nombreTutor,
   telefono_tutor: pacientes.telefonoTutor,
   activo: pacientes.activo,
-  fecha_registro: pacientes.fechaRegistro
+  fecha_registro: pacientes.fechaRegistro,
+  canal_adquisicion: pacientes.canalAdquisicion
 };
 
 const Paciente = {
@@ -39,6 +40,7 @@ const Paciente = {
       requiereTutor: data.requiere_tutor ?? null,
       nombreTutor: data.nombre_tutor ?? null,
       telefonoTutor: data.telefono_tutor ?? null,
+      canalAdquisicion: data.canal_adquisicion ?? null,
       activo: 1
     });
     return result.insertId;
