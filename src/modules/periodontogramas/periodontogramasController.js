@@ -4,8 +4,21 @@ const Controller = {
 
     async create(req, res) {
         try {
+            const data = {
+                ...req.body,
+                id_clinica: req.body.id_clinica || req.user.id_clinica,
+                id_dentista: req.body.id_dentista || req.user.id_dentista
+            };
 
-            const data = req.body;
+            if (!data.id_paciente) {
+                return res.status(400).json({ error: 'Se requiere el id_paciente para crear un periodontograma' });
+            }
+
+            if (!data.id_dentista) {
+                // Si el usuario no tiene id_dentista y no se envío, devolvemos error
+                return res.status(400).json({ error: 'El usuario actual no es un dentista. Asegúrese de especificar id_dentista en la petición.' });
+            }
+
             const result = await Service.create(data);
 
             res.status(201).json(result);

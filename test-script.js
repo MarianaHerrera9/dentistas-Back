@@ -1,0 +1,1 @@
+require('dotenv').config(); const db = require('./src/config/db'); const Model = require('./src/modules/periodontogramas/periodontogramasModel'); const Controller = require('./src/modules/periodontogramas/periodontogramasController'); Model.getEstadisticas(12).then(console.log).catch(console.error).finally(() => process.exit(0));
