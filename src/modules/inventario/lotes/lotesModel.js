@@ -12,7 +12,6 @@ const LotesProductos = {
             numero_lote: lotesProductos.numeroLote,
             fecha_caducidad: lotesProductos.fechaCaducidad,
             cantidad_inicial: lotesProductos.cantidadInicial,
-            fecha_creacion: lotesProductos.fechaCreacion,
             nombre_producto: productos.nombre,
             stock_lote: sql`COALESCE(${stockActual.stockDisponible}, 0)`.mapWith(Number)
         })
@@ -32,7 +31,6 @@ const LotesProductos = {
             numero_lote: lotesProductos.numeroLote,
             fecha_caducidad: lotesProductos.fechaCaducidad,
             cantidad_inicial: lotesProductos.cantidadInicial,
-            fecha_creacion: lotesProductos.fechaCreacion,
             nombre_producto: productos.nombre,
             stock_lote: sql`COALESCE(${stockActual.stockDisponible}, 0)`.mapWith(Number)
         })
