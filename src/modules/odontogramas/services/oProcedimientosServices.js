@@ -1,16 +1,12 @@
-const db = require('../../../config/db');
+const db = require('../../../db/index');
 const OdontogramaProcedimiento = require('../models/oProcedimientosModel');
 const MaterialUsado = require('../models/materialUsadoModel');
 
 async function crearProcedimientoConMateriales(data) {
-    const connection = await db.getConnection();
-
-    try {
-        await connection.beginTransaction();
-
+    return await db.transaction(async (tx) => {
         const procedimientoId = await OdontogramaProcedimiento.add(
             data.procedimiento,
-            connection
+            tx
         );
 
         for (const material of data.materiales) {
@@ -19,19 +15,12 @@ async function crearProcedimientoConMateriales(data) {
                     ...material,
                     id_odontograma_procedimiento: procedimientoId
                 },
-                connection
+                tx
             );
         }
 
-        await connection.commit();
         return procedimientoId;
-
-    } catch (error) {
-        await connection.rollback();
-        throw error;
-    } finally {
-        connection.release();
-    }
+    });
 }
 
 module.exports = {

@@ -1,26 +1,40 @@
-const db = require('../config/db');
+const db = require('../db/index');
+const { eq, and } = require('drizzle-orm');
+const { adminsSaas, roles } = require('../db/schema');
 
 const AdminSaas = {
     async create(data) {
-        const [result] = await db.execute(
-            `INSERT INTO admins_saas (nombre, usuario, password_hash, id_rol, activo)
-       VALUES (?, ?, ?, ?, 1)`,
-            [data.nombre, data.usuario, data.password_hash, data.id_rol]
-        );
+        const [result] = await db.insert(adminsSaas).values({
+            nombre: data.nombre,
+            usuario: data.usuario,
+            passwordHash: data.password_hash,
+            idRol: data.id_rol,
+            activo: 1
+        });
         return result.insertId;
     },
 
     async findByUsuarioWithRol(usuario) {
-        const [rows] = await db.execute(
-            `
-      SELECT a.*, r.nombre_rol
-      FROM admins_saas a
-      LEFT JOIN roles r ON r.id_rol = a.id_rol
-      WHERE a.usuario = ? AND a.activo = 1
-      `,
-            [usuario]
-        );
-        return rows[0];
+        const result = await db
+            .select({
+                id_admin: adminsSaas.idAdmin,
+                nombre: adminsSaas.nombre,
+                usuario: adminsSaas.usuario,
+                password_hash: adminsSaas.passwordHash,
+                id_rol: adminsSaas.idRol,
+                ultimo_acceso: adminsSaas.ultimoAcceso,
+                activo: adminsSaas.activo,
+                nombre_rol: roles.nombreRol
+            })
+            .from(adminsSaas)
+            .leftJoin(roles, eq(roles.idRol, adminsSaas.idRol))
+            .where(
+                and(
+                    eq(adminsSaas.usuario, usuario),
+                    eq(adminsSaas.activo, 1)
+                )
+            );
+        return result[0];
     }
 };
 

@@ -1,169 +1,136 @@
-const db = require('../../../config/db');
+const db = require('../../../db/index');
+const { eq, desc } = require('drizzle-orm');
+const { odontogramas, odontogramaVersiones } = require('../../../db/schema');
 
 const Odontograma = {
     async create(data, connection = db) {
         const { id_clinica, id_paciente } = data;
 
-        const [result] = await connection.query(
-            `INSERT INTO odontogramas (id_clinica, id_paciente, version)
-         VALUES (?, ?, 1)`,
-            [id_clinica, id_paciente]
-        );
+        const [result] = await connection.insert(odontogramas).values({
+            idClinica: id_clinica,
+            idPaciente: id_paciente,
+            version: 1,
+            estado: 'Activo'
+        });
 
         return result.insertId;
     },
 
     async findByPaciente(id_paciente) {
-        const [rows] = await db.query(
-            `SELECT *
-       FROM odontogramas
-       WHERE id_paciente = ?
-       ORDER BY fecha_creacion DESC`,
-            [id_paciente]
-        );
-        return rows;
+        const result = await db.select({
+            id_odontograma: odontogramas.idOdontograma,
+            id_clinica: odontogramas.idClinica,
+            id_paciente: odontogramas.idPaciente,
+            version: odontogramas.version,
+            estado: odontogramas.estado,
+            fecha_creacion: odontogramas.fechaCreacion,
+            nota_cierre: odontogramas.notaCierre
+        })
+            .from(odontogramas)
+            .where(eq(odontogramas.idPaciente, id_paciente))
+            .orderBy(desc(odontogramas.fechaCreacion));
+        return result;
     },
 
     async findById(id_odontograma) {
-        const [[row]] = await db.query(
-            `SELECT *
-       FROM odontogramas
-       WHERE id_odontograma = ?`,
-            [id_odontograma]
-        );
-        return row;
+        const result = await db.select({
+            id_odontograma: odontogramas.idOdontograma,
+            id_clinica: odontogramas.idClinica,
+            id_paciente: odontogramas.idPaciente,
+            version: odontogramas.version,
+            estado: odontogramas.estado,
+            fecha_creacion: odontogramas.fechaCreacion,
+            nota_cierre: odontogramas.notaCierre
+        })
+            .from(odontogramas)
+            .where(eq(odontogramas.idOdontograma, id_odontograma));
+        return result[0];
     },
 
     async update(id_odontograma, data) {
         const { nota_cierre, estado } = data;
 
-        await db.query(
-            `UPDATE odontogramas
-       SET nota_cierre = ?, estado = ?
-       WHERE id_odontograma = ?`,
-            [nota_cierre ?? null, estado ?? 'Activo', id_odontograma]
-        );
+        await db.update(odontogramas)
+            .set({
+                notaCierre: nota_cierre ?? null,
+                estado: estado ?? 'Activo'
+            })
+            .where(eq(odontogramas.idOdontograma, id_odontograma));
     },
 
     async archive(id_odontograma) {
-        const [result] = await db.query(
-            `UPDATE odontogramas
-         SET estado = 'Archivado'
-         WHERE id_odontograma = ?`,
-            [id_odontograma]
-        );
+        const [result] = await db.update(odontogramas)
+            .set({ estado: 'Archivado' })
+            .where(eq(odontogramas.idOdontograma, id_odontograma));
 
         return result.affectedRows;
     },
 
     async archiveAndCreateNew(id_odontograma) {
-        const connection = await db.getConnection();
-
-        try {
-            await connection.beginTransaction();
-
+        return await db.transaction(async (tx) => {
             // 1. Obtener odontograma actual
-            const [[current]] = await connection.query(
-                `SELECT id_paciente, id_clinica, version
-             FROM odontogramas
-             WHERE id_odontograma = ?`,
-                [id_odontograma]
-            );
+            const current = await tx.select({
+                id_paciente: odontogramas.idPaciente,
+                id_clinica: odontogramas.idClinica,
+                version: odontogramas.version
+            })
+                .from(odontogramas)
+                .where(eq(odontogramas.idOdontograma, id_odontograma));
 
-            if (!current) {
-                await connection.rollback();
-                return null;
-            }
+            if (!current[0]) return null;
 
             // 2. Archivar
-            await connection.query(
-                `UPDATE odontogramas
-             SET estado = 'Archivado'
-             WHERE id_odontograma = ?`,
-                [id_odontograma]
-            );
+            await tx.update(odontogramas)
+                .set({ estado: 'Archivado' })
+                .where(eq(odontogramas.idOdontograma, id_odontograma));
 
             // 3. Crear nuevo odontograma
-            const [result] = await connection.query(
-                `INSERT INTO odontogramas (id_clinica, id_paciente, version, estado)
-             VALUES (?, ?, ?, 'Activo')`,
-                [
-                    current.id_clinica,
-                    current.id_paciente,
-                    current.version + 1
-                ]
-            );
-
-            await connection.commit();
+            const [result] = await tx.insert(odontogramas).values({
+                idClinica: current[0].id_clinica,
+                idPaciente: current[0].id_paciente,
+                version: current[0].version + 1,
+                estado: 'Activo'
+            });
 
             return result.insertId;
-
-        } catch (error) {
-            await connection.rollback();
-            throw error;
-        } finally {
-            connection.release();
-        }
+        });
     },
 
     async archiveAndSnapshot(id_odontograma, snapshot, creado_por, nota_cierre) {
-        const connection = await db.getConnection();
+        return await db.transaction(async (tx) => {
+            const current = await tx.select({
+                id_paciente: odontogramas.idPaciente,
+                id_clinica: odontogramas.idClinica,
+                version: odontogramas.version
+            })
+                .from(odontogramas)
+                .where(eq(odontogramas.idOdontograma, id_odontograma));
 
-        try {
-            await connection.beginTransaction();
+            if (!current[0]) return null;
 
-            const [[current]] = await connection.query(
-                `SELECT id_paciente, id_clinica, version
-             FROM odontogramas
-             WHERE id_odontograma = ?`,
-                [id_odontograma]
-            );
+            await tx.update(odontogramas)
+                .set({
+                    estado: 'Archivado',
+                    notaCierre: nota_cierre
+                })
+                .where(eq(odontogramas.idOdontograma, id_odontograma));
 
-            if (!current) {
-                await connection.rollback();
-                return null;
-            }
+            await tx.insert(odontogramaVersiones).values({
+                idOdontograma: id_odontograma,
+                numeroVersion: current[0].version,
+                snapshot: snapshot,
+                creadoPor: creado_por
+            });
 
-            await connection.query(
-                `UPDATE odontogramas
-                 SET estado = 'Archivado',
-                     nota_cierre = ?
-                 WHERE id_odontograma = ?`,
-                [nota_cierre, id_odontograma]
-            );
-
-            await connection.query(
-                `INSERT INTO odontograma_versiones
-             (id_odontograma, numero_version, snapshot, creado_por)
-             VALUES (?, ?, ?, ?)`,
-                [
-                    id_odontograma,
-                    current.version,
-                    JSON.stringify(snapshot),
-                    creado_por
-                ]
-            );
-
-            const [result] = await connection.query(
-                `INSERT INTO odontogramas (id_clinica, id_paciente, version, estado)
-             VALUES (?, ?, ?, 'Activo')`,
-                [
-                    current.id_clinica,
-                    current.id_paciente,
-                    current.version + 1
-                ]
-            );
-
-            await connection.commit();
+            const [result] = await tx.insert(odontogramas).values({
+                idClinica: current[0].id_clinica,
+                idPaciente: current[0].id_paciente,
+                version: current[0].version + 1,
+                estado: 'Activo'
+            });
 
             return result.insertId;
-
-        } catch (error) {
-            await connection.rollback();
-            throw error;
-        } finally {
-            connection.release();
-        }
+        });
     }
 
 };

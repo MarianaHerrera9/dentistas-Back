@@ -7,6 +7,7 @@ const CitasService = {
         try {
             await conn.beginTransaction();
 
+            // 1. Verificar solapamiento con otras citas activas
             const [rows] = await conn.execute(
                 `SELECT COUNT(*) total
                  FROM citas
@@ -18,6 +19,37 @@ const CitasService = {
             );
 
             if (rows[0].total > 0) throw new Error('Horario no disponible');
+
+            // 2. Verificar vacaciones del doctor en esa fecha (bloqueo día completo)
+            const [vacaciones] = await conn.execute(
+                `SELECT COUNT(*) total
+                 FROM ausencias_dentistas
+                 WHERE id_dentista = ?
+                   AND tipo = 'vacaciones'
+                   AND fecha_inicio <= ?
+                   AND fecha_fin >= ?`,
+                [data.id_dentista, data.fecha_cita, data.fecha_cita]
+            );
+
+            if (vacaciones[0].total > 0) {
+                throw new Error('El doctor tiene vacaciones ese día y no puede recibir citas');
+            }
+
+            // 3. Verificar no_disponibilidades que solapen el horario
+            const [noDisponible] = await conn.execute(
+                `SELECT COUNT(*) total
+                 FROM ausencias_dentistas
+                 WHERE id_dentista = ?
+                   AND tipo = 'no_disponibilidad'
+                   AND fecha_inicio = ?
+                   AND hora_inicio < ?
+                   AND hora_fin > ?`,
+                [data.id_dentista, data.fecha_cita, data.hora_fin, data.hora_inicio]
+            );
+
+            if (noDisponible[0].total > 0) {
+                throw new Error('El doctor no está disponible en ese horario');
+            }
 
             await conn.execute(
                 `INSERT INTO citas (
@@ -54,6 +86,7 @@ const CitasService = {
             conn.release();
         }
     },
+
 
     getAgendaByDate(id_clinica, fecha) {
         return CitasModel.getByDate(id_clinica, fecha);

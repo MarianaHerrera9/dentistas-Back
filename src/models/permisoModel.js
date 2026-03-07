@@ -1,28 +1,24 @@
-const db = require('../config/db');
+const db = require('../db/index');
+const { ne, eq } = require('drizzle-orm');
+const { permisos, rolPermiso } = require('../db/schema');
 
 const Permiso = {
-    async getAllForClinica() {
-      const [rows] = await db.execute(
-        `SELECT * FROM permisos WHERE nombre != 'gestionar_saas'`
-      );
-      console.log("Roles desde DB:", rows);
-      return rows;
-    },
+  async getAllForClinica() {
+    const result = await db
+      .select()
+      .from(permisos)
+      .where(ne(permisos.nombre, 'gestionar_saas'));
+    return result;
+  },
 
-    async getPermisosByRol(id_rol) {
-        const [rows] = await db.execute(
-            `
-    SELECT p.nombre
-    FROM rol_permiso rp
-    INNER JOIN permisos p ON p.id_permiso = rp.id_permiso
-    WHERE rp.id_rol = ?
-    `,
-            [id_rol]
-        );
-        return rows.map(r => r.nombre);
-    }
-
+  async getPermisosByRol(id_rol) {
+    const result = await db
+      .select({ nombre: permisos.nombre })
+      .from(rolPermiso)
+      .innerJoin(permisos, eq(permisos.idPermiso, rolPermiso.idPermiso))
+      .where(eq(rolPermiso.idRol, id_rol));
+    return result.map(r => r.nombre);
+  }
 };
-  
-  module.exports = Permiso;
-  
+
+module.exports = Permiso;

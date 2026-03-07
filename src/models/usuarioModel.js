@@ -1,71 +1,78 @@
-const db = require('../config/db');
+const db = require('../db/index');
+const { eq, and, desc } = require('drizzle-orm');
+const { usuariosLogin, roles } = require('../db/schema');
 
 const Usuario = {
   async create(data) {
-    const [result] = await db.execute(
-      `INSERT INTO usuarios_login (id_clinica, id_dentista, usuario, password_hash, id_rol, activo)
-       VALUES (?, ?, ?, ?, ?, true)`,
-      [
-        data.id_clinica,
-        data.id_dentista,
-        data.usuario,
-        data.password_hash,
-        data.id_rol
-      ]
-    );
+    const [result] = await db.insert(usuariosLogin).values({
+      idClinica: data.id_clinica,
+      idDentista: data.id_dentista,
+      usuario: data.usuario,
+      passwordHash: data.password_hash,
+      idRol: data.id_rol,
+      activo: 1
+    });
     return result.insertId;
   },
 
   async findByUsuarioWithRol(usuario) {
-    const [rows] = await db.execute(
-      `
-    SELECT u.*, r.nombre_rol
-    FROM usuarios_login u
-    LEFT JOIN roles r ON r.id_rol = u.id_rol
-    WHERE u.usuario = ? AND u.activo = TRUE
-    `,
-      [usuario]
-    );
-    return rows[0];
+    const result = await db
+      .select({
+        id_usuario: usuariosLogin.idUsuario,
+        id_clinica: usuariosLogin.idClinica,
+        id_dentista: usuariosLogin.idDentista,
+        usuario: usuariosLogin.usuario,
+        password_hash: usuariosLogin.passwordHash,
+        id_rol: usuariosLogin.idRol,
+        ultimo_acceso: usuariosLogin.ultimoAcceso,
+        activo: usuariosLogin.activo,
+        nombre_rol: roles.nombreRol
+      })
+      .from(usuariosLogin)
+      .leftJoin(roles, eq(roles.idRol, usuariosLogin.idRol))
+      .where(
+        and(
+          eq(usuariosLogin.usuario, usuario),
+          eq(usuariosLogin.activo, 1)
+        )
+      );
+    return result[0];
   },
 
   async findByClinica(id_clinica) {
-    const [rows] = await db.execute(
-      `
-    SELECT 
-      u.id_usuario,
-      u.usuario,
-      u.activo,
-      u.id_rol,
-      r.nombre_rol
-    FROM usuarios_login u
-    LEFT JOIN roles r ON r.id_rol = u.id_rol
-    WHERE u.id_clinica = ?
-    ORDER BY u.id_usuario DESC
-    `,
-      [id_clinica]
-    );
-    return rows;
+    const result = await db
+      .select({
+        id_usuario: usuariosLogin.idUsuario,
+        usuario: usuariosLogin.usuario,
+        activo: usuariosLogin.activo,
+        id_rol: usuariosLogin.idRol,
+        nombre_rol: roles.nombreRol
+      })
+      .from(usuariosLogin)
+      .leftJoin(roles, eq(roles.idRol, usuariosLogin.idRol))
+      .where(eq(usuariosLogin.idClinica, id_clinica))
+      .orderBy(desc(usuariosLogin.idUsuario));
+    return result;
   },
 
   async update(id_usuario, data) {
-  const [result] = await db.execute(
-    `UPDATE usuarios_login
-     SET usuario = ?, id_rol = ?
-     WHERE id_usuario = ?`,
-    [data.usuario, data.id_rol, id_usuario]
-  );
-  return result.affectedRows;
-},
+    const [result] = await db
+      .update(usuariosLogin)
+      .set({
+        usuario: data.usuario,
+        idRol: data.id_rol
+      })
+      .where(eq(usuariosLogin.idUsuario, id_usuario));
+    return result.affectedRows;
+  },
 
   async activarUsuarios(id_usuario, activo) {
-  const [result] = await db.execute(
-    `UPDATE usuarios_login SET activo = ? WHERE id_usuario = ?`,
-    [activo, id_usuario]
-  );
-  return result.affectedRows;
-}
-
+    const [result] = await db
+      .update(usuariosLogin)
+      .set({ activo })
+      .where(eq(usuariosLogin.idUsuario, id_usuario));
+    return result.affectedRows;
+  }
 };
 
 module.exports = Usuario;

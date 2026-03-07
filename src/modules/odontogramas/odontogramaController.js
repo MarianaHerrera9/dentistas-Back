@@ -7,34 +7,54 @@ const MaterialUsado = require("./models/materialUsadoModel");
 const Procedimiento = require("./models/oProcedimientosModel");
 
 const create = async (req, res) => {
-    const id = await OdontogramaService.createNewOdontograma(req.body);
-    res.status(201).json({ id });
+    try {
+        const id = await OdontogramaService.createNewOdontograma(req.body);
+        res.status(201).json({ id });
+    } catch (error) {
+        console.error("Error creating odontograma:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 const listByPaciente = async (req, res) => {
-    const data = await Odontograma.findByPaciente(req.params.idPaciente);
-    res.json(data);
+    try {
+        const data = await Odontograma.findByPaciente(req.params.idPaciente);
+        res.json(data);
+    } catch (error) {
+        console.error("Error listing odontogramas by paciente:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 const getFull = async (req, res) => {
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    const odontograma = await Odontograma.findById(id);
-    const diagnosticos = await Diagnostico.findByOdontograma(id);
-    const procedimientos = await Procedimiento.findByOdontograma(id);
+        const odontograma = await Odontograma.findById(id);
+        const diagnosticos = await Diagnostico.findByOdontograma(id);
+        const procedimientos = await Procedimiento.findByOdontograma(id);
 
-    for (const proc of procedimientos) {
-        proc.materiales = await MaterialUsado.findByProcedimiento(
-            proc.id_odontograma_procedimiento
-        );
+        for (const proc of procedimientos) {
+            proc.materiales = await MaterialUsado.findByProcedimiento(
+                proc.id_odontograma_procedimiento
+            );
+        }
+
+        res.json({ odontograma, diagnosticos, procedimientos });
+    } catch (error) {
+        console.error("Error getting full odontograma:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
     }
-
-    res.json({ odontograma, diagnosticos, procedimientos });
 };
 
 const update = async (req, res) => {
-    await Odontograma.update(req.params.id, req.body);
-    res.json({ message: "Odontograma actualizado" });
+    try {
+        await Odontograma.update(req.params.id, req.body);
+        res.json({ message: "Odontograma actualizado" });
+    } catch (error) {
+        console.error("Error updating odontograma:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 const archive = async (req, res) => {
@@ -87,16 +107,26 @@ const archive = async (req, res) => {
 };
 
 const addDiagnostico = async (req, res) => {
-    await Diagnostico.add({
-        ...req.body,
-        id_odontograma: req.params.id
-    });
-    res.status(201).json({ message: "Diagnóstico agregado" });
+    try {
+        await Diagnostico.add({
+            ...req.body,
+            id_odontograma: req.params.id
+        });
+        res.status(201).json({ message: "Diagnóstico agregado" });
+    } catch (error) {
+        console.error("Error adding diagnostico:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 const deleteDiagnostico = async (req, res) => {
-    await Diagnostico.delete(req.params.id);
-    res.json({ message: "Diagnóstico eliminado" });
+    try {
+        await Diagnostico.delete(req.params.id);
+        res.json({ message: "Diagnóstico eliminado" });
+    } catch (error) {
+        console.error("Error deleting diagnostico:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 const addProcedimiento = async (req, res) => {
@@ -124,16 +154,21 @@ const addProcedimiento = async (req, res) => {
 };
 
 const createVersion = async (req, res) => {
-    const { snapshot } = req.body;
-    const userId = req.user?.id ?? null; // por si no hay auth aún
+    try {
+        const { snapshot } = req.body;
+        const userId = req.user?.id ?? null; // por si no hay auth aún
 
-    await VersionService.createSnapshotVersion(
-        req.params.id,
-        snapshot,
-        userId
-    );
+        await VersionService.createSnapshotVersion(
+            req.params.id,
+            snapshot,
+            userId
+        );
 
-    res.status(201).json({ message: "Versión creada" });
+        res.status(201).json({ message: "Versión creada" });
+    } catch (error) {
+        console.error("Error creating version:", error);
+        res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
 };
 
 module.exports = {

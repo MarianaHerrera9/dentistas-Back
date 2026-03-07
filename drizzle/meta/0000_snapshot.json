@@ -1,0 +1,4363 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "mysql",
+  "tables": {
+    "admins_saas": {
+      "name": "admins_saas",
+      "columns": {
+        "id_admin": {
+          "autoincrement": true,
+          "name": "id_admin",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usuario": {
+          "autoincrement": false,
+          "name": "usuario",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "autoincrement": false,
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_rol": {
+          "autoincrement": false,
+          "name": "id_rol",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ultimo_acceso": {
+          "autoincrement": false,
+          "name": "ultimo_acceso",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "admins_saas_id_admin": {
+          "name": "admins_saas_id_admin",
+          "columns": [
+            "id_admin"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_admin_idrol": {
+          "name": "fk_admin_idrol",
+          "tableFrom": "admins_saas",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "id_rol"
+          ],
+          "columnsTo": [
+            "id_rol"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "uq_admin_email": {
+          "name": "uq_admin_email",
+          "columns": [
+            "usuario"
+          ]
+        },
+        "usuario": {
+          "name": "usuario",
+          "columns": [
+            "usuario"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "antecedentes": {
+      "name": "antecedentes",
+      "columns": {
+        "id_antecedente": {
+          "autoincrement": true,
+          "name": "id_antecedente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_tipo_antecedente": {
+          "autoincrement": false,
+          "name": "id_tipo_antecedente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "antecedentes_id_antecedente": {
+          "name": "antecedentes_id_antecedente",
+          "columns": [
+            "id_antecedente"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_antecedentes_paciente": {
+          "name": "fk_antecedentes_paciente",
+          "tableFrom": "antecedentes",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_antecedentes_tipo": {
+          "name": "fk_antecedentes_tipo",
+          "tableFrom": "antecedentes",
+          "tableTo": "tipo_antecedente",
+          "columnsFrom": [
+            "id_tipo_antecedente"
+          ],
+          "columnsTo": [
+            "id_tipo"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "archivos_clinicas": {
+      "name": "archivos_clinicas",
+      "columns": {
+        "id_archivo": {
+          "autoincrement": true,
+          "name": "id_archivo",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_consulta": {
+          "autoincrement": false,
+          "name": "id_consulta",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "default": "'Otro'",
+          "autoincrement": false,
+          "name": "tipo",
+          "type": "enum('Intraoral','Extraoral','Panoramica','Periapical','Documento_Medico','Consentimiento_Informado','Otro')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nombre_archivo": {
+          "autoincrement": false,
+          "name": "nombre_archivo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_subida": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_subida",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ruta_archivo": {
+          "autoincrement": false,
+          "name": "ruta_archivo",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "archivos_clinicas_id_archivo": {
+          "name": "archivos_clinicas_id_archivo",
+          "columns": [
+            "id_archivo"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_archivos_consulta": {
+          "name": "fk_archivos_consulta",
+          "tableFrom": "archivos_clinicas",
+          "tableTo": "consultas",
+          "columnsFrom": [
+            "id_consulta"
+          ],
+          "columnsTo": [
+            "id_consulta"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_archivos_paciente": {
+          "name": "fk_archivos_paciente",
+          "tableFrom": "archivos_clinicas",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "auditoria": {
+      "name": "auditoria",
+      "columns": {
+        "id_audit": {
+          "autoincrement": true,
+          "name": "id_audit",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entidad": {
+          "autoincrement": false,
+          "name": "entidad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_entidad": {
+          "autoincrement": false,
+          "name": "id_entidad",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "accion": {
+          "autoincrement": false,
+          "name": "accion",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usuario": {
+          "autoincrement": false,
+          "name": "usuario",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "detalle": {
+          "autoincrement": false,
+          "name": "detalle",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_origen": {
+          "autoincrement": false,
+          "name": "ip_origen",
+          "type": "varchar(45)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "autoincrement": false,
+          "name": "user_agent",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "auditoria_id_audit": {
+          "name": "auditoria_id_audit",
+          "columns": [
+            "id_audit"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_audit_clinica": {
+          "name": "fk_audit_clinica",
+          "tableFrom": "auditoria",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "bloques_disponibilidad": {
+      "name": "bloques_disponibilidad",
+      "columns": {
+        "id_bloque": {
+          "autoincrement": true,
+          "name": "id_bloque",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dia_semana": {
+          "autoincrement": false,
+          "name": "dia_semana",
+          "type": "enum('Lun','Mar','Mie','Jue','Vie','Sab','Dom')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hora_inicio": {
+          "autoincrement": false,
+          "name": "hora_inicio",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hora_fin": {
+          "autoincrement": false,
+          "name": "hora_fin",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "bloques_disponibilidad_id_bloque": {
+          "name": "bloques_disponibilidad_id_bloque",
+          "columns": [
+            "id_bloque"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_bloques_clinica": {
+          "name": "fk_bloques_clinica",
+          "tableFrom": "bloques_disponibilidad",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "catalogo_diagnosticos": {
+      "name": "catalogo_diagnosticos",
+      "columns": {
+        "id_diagnostico": {
+          "autoincrement": true,
+          "name": "id_diagnostico",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "autoincrement": false,
+          "name": "tipo",
+          "type": "enum('Diente','Superficie')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color_icon": {
+          "autoincrement": false,
+          "name": "color_icon",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "simbolo": {
+          "autoincrement": false,
+          "name": "simbolo",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "catalogo_diagnosticos_id_diagnostico": {
+          "name": "catalogo_diagnosticos_id_diagnostico",
+          "columns": [
+            "id_diagnostico"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "catalogo_procedimientos": {
+      "name": "catalogo_procedimientos",
+      "columns": {
+        "id_catalogo_procedimiento": {
+          "autoincrement": true,
+          "name": "id_catalogo_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color": {
+          "default": "'#00676E'",
+          "autoincrement": false,
+          "name": "color",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "catalogo_procedimientos_id_catalogo_procedimiento": {
+          "name": "catalogo_procedimientos_id_catalogo_procedimiento",
+          "columns": [
+            "id_catalogo_procedimiento"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_catalogo_clinica": {
+          "name": "fk_catalogo_clinica",
+          "tableFrom": "catalogo_procedimientos",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "citas": {
+      "name": "citas",
+      "columns": {
+        "id_cita": {
+          "autoincrement": true,
+          "name": "id_cita",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_cita": {
+          "autoincrement": false,
+          "name": "fecha_cita",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hora_inicio": {
+          "autoincrement": false,
+          "name": "hora_inicio",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hora_fin": {
+          "autoincrement": false,
+          "name": "hora_fin",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "autoincrement": false,
+          "name": "estado",
+          "type": "enum('Pendiente','Confirmada','Cancelada','Completada')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_procedimiento": {
+          "autoincrement": false,
+          "name": "id_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notas": {
+          "autoincrement": false,
+          "name": "notas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creado_por": {
+          "autoincrement": false,
+          "name": "creado_por",
+          "type": "enum('Paciente','Recepcionista','Dentista')",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "citas_id_cita": {
+          "name": "citas_id_cita",
+          "columns": [
+            "id_cita"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_citas_clinicas": {
+          "name": "fk_citas_clinicas",
+          "tableFrom": "citas",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_citas_dentistas": {
+          "name": "fk_citas_dentistas",
+          "tableFrom": "citas",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_citas_pacientes": {
+          "name": "fk_citas_pacientes",
+          "tableFrom": "citas",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_citas_procedimientos": {
+          "name": "fk_citas_procedimientos",
+          "tableFrom": "citas",
+          "tableTo": "catalogo_procedimientos",
+          "columnsFrom": [
+            "id_procedimiento"
+          ],
+          "columnsTo": [
+            "id_catalogo_procedimiento"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "unica_cita": {
+          "name": "unica_cita",
+          "columns": [
+            "id_dentista",
+            "fecha_cita",
+            "hora_inicio"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "clinicas": {
+      "name": "clinicas",
+      "columns": {
+        "id_clinica": {
+          "autoincrement": true,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subdominio": {
+          "autoincrement": false,
+          "name": "subdominio",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "logo_url": {
+          "autoincrement": false,
+          "name": "logo_url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color_principal": {
+          "autoincrement": false,
+          "name": "color_principal",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "autoincrement": false,
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefono": {
+          "autoincrement": false,
+          "name": "telefono",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correo_contacto": {
+          "autoincrement": false,
+          "name": "correo_contacto",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plan_saas": {
+          "default": "'Básico'",
+          "autoincrement": false,
+          "name": "plan_saas",
+          "type": "enum('Básico','Pro','Premium')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "limite_pacientes": {
+          "autoincrement": false,
+          "name": "limite_pacientes",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color_secundario": {
+          "default": "'#D8F0F2'",
+          "autoincrement": false,
+          "name": "color_secundario",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color_extra": {
+          "default": "'#ff7701'",
+          "autoincrement": false,
+          "name": "color_extra",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "clinicas_id_clinica": {
+          "name": "clinicas_id_clinica",
+          "columns": [
+            "id_clinica"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {
+        "subdominio": {
+          "name": "subdominio",
+          "columns": [
+            "subdominio"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "configuracion_clinica": {
+      "name": "configuracion_clinica",
+      "columns": {
+        "id_config": {
+          "autoincrement": true,
+          "name": "id_config",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tiempo_anticipacion_cancelacion": {
+          "autoincrement": false,
+          "name": "tiempo_anticipacion_cancelacion",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_citas_dia": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "max_citas_dia",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "permite_agendamiento_online": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "permite_agendamiento_online",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tolerancia_llegada_minutos": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "tolerancia_llegada_minutos",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "permitir_reserva_superpuesta": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "permitir_reserva_superpuesta",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zona_horaria": {
+          "autoincrement": false,
+          "name": "zona_horaria",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_actualizacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_actualizacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "onUpdate": true
+        },
+        "requiere_anticipo": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "requiere_anticipo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duracion_bloque": {
+          "default": 60,
+          "autoincrement": false,
+          "name": "duracion_bloque",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tiempo_entre_citas": {
+          "default": 10,
+          "autoincrement": false,
+          "name": "tiempo_entre_citas",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "numeracion_odontograma": {
+          "default": "'FDI'",
+          "autoincrement": false,
+          "name": "numeracion_odontograma",
+          "type": "enum('FDI','Universal')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dias_laborales": {
+          "autoincrement": false,
+          "name": "dias_laborales",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hora_inicio_clinica": {
+          "autoincrement": false,
+          "name": "hora_inicio_clinica",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hora_fin_clinica": {
+          "autoincrement": false,
+          "name": "hora_fin_clinica",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "configuracion_clinica_id_config": {
+          "name": "configuracion_clinica_id_config",
+          "columns": [
+            "id_config"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_config_clinica": {
+          "name": "fk_config_clinica",
+          "tableFrom": "configuracion_clinica",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_config_dentista": {
+          "name": "fk_config_dentista",
+          "tableFrom": "configuracion_clinica",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "consultas": {
+      "name": "consultas",
+      "columns": {
+        "id_consulta": {
+          "autoincrement": true,
+          "name": "id_consulta",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "motivo_consulta": {
+          "autoincrement": false,
+          "name": "motivo_consulta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "examen_extraoral": {
+          "autoincrement": false,
+          "name": "examen_extraoral",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "examen_intraoral": {
+          "autoincrement": false,
+          "name": "examen_intraoral",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_consulta": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_consulta",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proxima_cita": {
+          "autoincrement": false,
+          "name": "proxima_cita",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notas": {
+          "autoincrement": false,
+          "name": "notas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "consultas_id_consulta": {
+          "name": "consultas_id_consulta",
+          "columns": [
+            "id_consulta"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_citas_paciente": {
+          "name": "idx_citas_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_consultas_clinica": {
+          "name": "fk_consultas_clinica",
+          "tableFrom": "consultas",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_consultas_dentista": {
+          "name": "fk_consultas_dentista",
+          "tableFrom": "consultas",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "fk_consultas_paciente": {
+          "name": "fk_consultas_paciente",
+          "tableFrom": "consultas",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "cuotas_tratamiento": {
+      "name": "cuotas_tratamiento",
+      "columns": {
+        "id_cuota": {
+          "autoincrement": true,
+          "name": "id_cuota",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_plan": {
+          "autoincrement": false,
+          "name": "id_plan",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monto": {
+          "autoincrement": false,
+          "name": "monto",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_programada": {
+          "autoincrement": false,
+          "name": "fecha_programada",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pagada": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "pagada",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "cuotas_tratamiento_id_cuota": {
+          "name": "cuotas_tratamiento_id_cuota",
+          "columns": [
+            "id_cuota"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_cuotas_paciente": {
+          "name": "idx_cuotas_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_cuotas_paciente": {
+          "name": "fk_cuotas_paciente",
+          "tableFrom": "cuotas_tratamiento",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_cuotas_plan": {
+          "name": "fk_cuotas_plan",
+          "tableFrom": "cuotas_tratamiento",
+          "tableTo": "plan_tratamiento",
+          "columnsFrom": [
+            "id_plan"
+          ],
+          "columnsTo": [
+            "id_plan"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "datos_facturacion": {
+      "name": "datos_facturacion",
+      "columns": {
+        "id_dato_facturacion": {
+          "autoincrement": true,
+          "name": "id_dato_facturacion",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rfc": {
+          "autoincrement": false,
+          "name": "rfc",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "razon_social": {
+          "autoincrement": false,
+          "name": "razon_social",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion_fiscal": {
+          "autoincrement": false,
+          "name": "direccion_fiscal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "datos_facturacion_id_dato_facturacion": {
+          "name": "datos_facturacion_id_dato_facturacion",
+          "columns": [
+            "id_dato_facturacion"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_facturacion_paciente": {
+          "name": "fk_facturacion_paciente",
+          "tableFrom": "datos_facturacion",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dentistas": {
+      "name": "dentistas",
+      "columns": {
+        "id_dentista": {
+          "autoincrement": true,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "apellido_paterno": {
+          "autoincrement": false,
+          "name": "apellido_paterno",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apellido_materno": {
+          "autoincrement": false,
+          "name": "apellido_materno",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefono": {
+          "autoincrement": false,
+          "name": "telefono",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correo": {
+          "autoincrement": false,
+          "name": "correo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "especialidad": {
+          "autoincrement": false,
+          "name": "especialidad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "dentistas_id_dentista": {
+          "name": "dentistas_id_dentista",
+          "columns": [
+            "id_dentista"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_dentistas_clinica": {
+          "name": "fk_dentistas_clinica",
+          "tableFrom": "dentistas",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "examen_clinico_inicial_extraoral": {
+      "name": "examen_clinico_inicial_extraoral",
+      "columns": {
+        "id_extraoral": {
+          "autoincrement": true,
+          "name": "id_extraoral",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cabeza": {
+          "autoincrement": false,
+          "name": "cabeza",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cara": {
+          "autoincrement": false,
+          "name": "cara",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atm": {
+          "autoincrement": false,
+          "name": "atm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ganglios": {
+          "autoincrement": false,
+          "name": "ganglios",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "labios": {
+          "autoincrement": false,
+          "name": "labios",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senales_particulares": {
+          "autoincrement": false,
+          "name": "senales_particulares",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "examen_clinico_inicial_extraoral_id_extraoral": {
+          "name": "examen_clinico_inicial_extraoral_id_extraoral",
+          "columns": [
+            "id_extraoral"
+          ]
+        }
+      },
+      "indexes": {
+        "id_paciente": {
+          "name": "id_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "examen_clinico_inicial_extraoral_ibfk_1": {
+          "name": "examen_clinico_inicial_extraoral_ibfk_1",
+          "tableFrom": "examen_clinico_inicial_extraoral",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "examen_clinico_inicial_intraoral": {
+      "name": "examen_clinico_inicial_intraoral",
+      "columns": {
+        "id_intraoral": {
+          "autoincrement": true,
+          "name": "id_intraoral",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encia": {
+          "autoincrement": false,
+          "name": "encia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "orofaringe": {
+          "autoincrement": false,
+          "name": "orofaringe",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lengua": {
+          "autoincrement": false,
+          "name": "lengua",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "piso_boca": {
+          "autoincrement": false,
+          "name": "piso_boca",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paladar_duro": {
+          "autoincrement": false,
+          "name": "paladar_duro",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_oclusion": {
+          "autoincrement": false,
+          "name": "tipo_oclusion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paladar_blando": {
+          "autoincrement": false,
+          "name": "paladar_blando",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reborde_residual": {
+          "autoincrement": false,
+          "name": "reborde_residual",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "examen_clinico_inicial_intraoral_id_intraoral": {
+          "name": "examen_clinico_inicial_intraoral_id_intraoral",
+          "columns": [
+            "id_intraoral"
+          ]
+        }
+      },
+      "indexes": {
+        "id_paciente": {
+          "name": "id_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "examen_clinico_inicial_intraoral_ibfk_1": {
+          "name": "examen_clinico_inicial_intraoral_ibfk_1",
+          "tableFrom": "examen_clinico_inicial_intraoral",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "lotes_productos": {
+      "name": "lotes_productos",
+      "columns": {
+        "id_lote": {
+          "autoincrement": true,
+          "name": "id_lote",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_producto": {
+          "autoincrement": false,
+          "name": "id_producto",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_lote": {
+          "autoincrement": false,
+          "name": "numero_lote",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_caducidad": {
+          "autoincrement": false,
+          "name": "fecha_caducidad",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cantidad_inicial": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "cantidad_inicial",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "lotes_productos_id_lote": {
+          "name": "lotes_productos_id_lote",
+          "columns": [
+            "id_lote"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_lotes_productos_clinica": {
+          "name": "idx_lotes_productos_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_lotes_producto": {
+          "name": "fk_lotes_producto",
+          "tableFrom": "lotes_productos",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "id_producto"
+          ],
+          "columnsTo": [
+            "id_producto"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_lotes_productos_clinica": {
+          "name": "fk_lotes_productos_clinica",
+          "tableFrom": "lotes_productos",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "materiales_usados": {
+      "name": "materiales_usados",
+      "columns": {
+        "id_material_usado": {
+          "autoincrement": true,
+          "name": "id_material_usado",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_odontograma_procedimiento": {
+          "autoincrement": false,
+          "name": "id_odontograma_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_producto": {
+          "autoincrement": false,
+          "name": "id_producto",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_lote": {
+          "autoincrement": false,
+          "name": "id_lote",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cantidad": {
+          "autoincrement": false,
+          "name": "cantidad",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "precio_unitario": {
+          "autoincrement": false,
+          "name": "precio_unitario",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "materiales_usados_id_material_usado": {
+          "name": "materiales_usados_id_material_usado",
+          "columns": [
+            "id_material_usado"
+          ]
+        }
+      },
+      "indexes": {
+        "fk_mat_procedimiento": {
+          "name": "fk_mat_procedimiento",
+          "columns": [
+            "id_odontograma_procedimiento"
+          ],
+          "isUnique": false
+        },
+        "idx_mat_lote": {
+          "name": "idx_mat_lote",
+          "columns": [
+            "id_lote"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_mat_lote": {
+          "name": "fk_mat_lote",
+          "tableFrom": "materiales_usados",
+          "tableTo": "lotes_productos",
+          "columnsFrom": [
+            "id_lote"
+          ],
+          "columnsTo": [
+            "id_lote"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_mat_paciente": {
+          "name": "fk_mat_paciente",
+          "tableFrom": "materiales_usados",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_mat_producto": {
+          "name": "fk_mat_producto",
+          "tableFrom": "materiales_usados",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "id_producto"
+          ],
+          "columnsTo": [
+            "id_producto"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "movimientos_inventario": {
+      "name": "movimientos_inventario",
+      "columns": {
+        "id_movimiento": {
+          "autoincrement": true,
+          "name": "id_movimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_producto": {
+          "autoincrement": false,
+          "name": "id_producto",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_lote": {
+          "autoincrement": false,
+          "name": "id_lote",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo": {
+          "autoincrement": false,
+          "name": "tipo",
+          "type": "enum('Entrada','Salida')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cantidad": {
+          "autoincrement": false,
+          "name": "cantidad",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "motivo": {
+          "autoincrement": false,
+          "name": "motivo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_movimiento": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_movimiento",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "movimientos_inventario_id_movimiento": {
+          "name": "movimientos_inventario_id_movimiento",
+          "columns": [
+            "id_movimiento"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_movimientos_clinica": {
+          "name": "idx_movimientos_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_movimientos_clinica": {
+          "name": "fk_movimientos_clinica",
+          "tableFrom": "movimientos_inventario",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "fk_mov_lote": {
+          "name": "fk_mov_lote",
+          "tableFrom": "movimientos_inventario",
+          "tableTo": "lotes_productos",
+          "columnsFrom": [
+            "id_lote"
+          ],
+          "columnsTo": [
+            "id_lote"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "fk_mov_prod": {
+          "name": "fk_mov_prod",
+          "tableFrom": "movimientos_inventario",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "id_producto"
+          ],
+          "columnsTo": [
+            "id_producto"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "odontograma_diagnosticos": {
+      "name": "odontograma_diagnosticos",
+      "columns": {
+        "id_diente": {
+          "autoincrement": true,
+          "name": "id_diente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_odontograma": {
+          "autoincrement": false,
+          "name": "id_odontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_catalogo_diagnostico": {
+          "autoincrement": false,
+          "name": "id_catalogo_diagnostico",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_diente": {
+          "autoincrement": false,
+          "name": "numero_diente",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "superficie": {
+          "autoincrement": false,
+          "name": "superficie",
+          "type": "enum('O','M','D','V','L','I','P')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observaciones": {
+          "autoincrement": false,
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_actualizacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_actualizacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "onUpdate": true
+        },
+        "otro": {
+          "autoincrement": false,
+          "name": "otro",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_afectacion": {
+          "default": "'CORONA'",
+          "autoincrement": false,
+          "name": "tipo_afectacion",
+          "type": "enum('CORONA','RAIZ','PIEZA_COMPLETA')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_raiz": {
+          "autoincrement": false,
+          "name": "numero_raiz",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "odontograma_diagnosticos_id_diente": {
+          "name": "odontograma_diagnosticos_id_diente",
+          "columns": [
+            "id_diente"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_odontdiag_catalogo": {
+          "name": "fk_odontdiag_catalogo",
+          "tableFrom": "odontograma_diagnosticos",
+          "tableTo": "catalogo_diagnosticos",
+          "columnsFrom": [
+            "id_catalogo_diagnostico"
+          ],
+          "columnsTo": [
+            "id_diagnostico"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "fk_odontdiag_odontograma": {
+          "name": "fk_odontdiag_odontograma",
+          "tableFrom": "odontograma_diagnosticos",
+          "tableTo": "odontogramas",
+          "columnsFrom": [
+            "id_odontograma"
+          ],
+          "columnsTo": [
+            "id_odontograma"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "odontograma_procedimientos": {
+      "name": "odontograma_procedimientos",
+      "columns": {
+        "id_odontograma_procedimiento": {
+          "autoincrement": true,
+          "name": "id_odontograma_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_odontograma": {
+          "autoincrement": false,
+          "name": "id_odontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_plan": {
+          "autoincrement": false,
+          "name": "id_plan",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_plan_tratamiento_procedimiento": {
+          "autoincrement": false,
+          "name": "id_plan_tratamiento_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_realizacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_realizacion",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_diagnostico": {
+          "autoincrement": false,
+          "name": "id_diagnostico",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "odontograma_procedimientos_id_odontograma_procedimiento": {
+          "name": "odontograma_procedimientos_id_odontograma_procedimiento",
+          "columns": [
+            "id_odontograma_procedimiento"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_op_dentista": {
+          "name": "fk_op_dentista",
+          "tableFrom": "odontograma_procedimientos",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_op_odontograma": {
+          "name": "fk_op_odontograma",
+          "tableFrom": "odontograma_procedimientos",
+          "tableTo": "odontogramas",
+          "columnsFrom": [
+            "id_odontograma"
+          ],
+          "columnsTo": [
+            "id_odontograma"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_op_plan": {
+          "name": "fk_op_plan",
+          "tableFrom": "odontograma_procedimientos",
+          "tableTo": "plan_tratamiento",
+          "columnsFrom": [
+            "id_plan"
+          ],
+          "columnsTo": [
+            "id_plan"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_op_plan_proc": {
+          "name": "fk_op_plan_proc",
+          "tableFrom": "odontograma_procedimientos",
+          "tableTo": "plan_tratamiento_procedimientos",
+          "columnsFrom": [
+            "id_plan_tratamiento_procedimiento"
+          ],
+          "columnsTo": [
+            "id_procedimiento"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "odontograma_versiones": {
+      "name": "odontograma_versiones",
+      "columns": {
+        "id_version": {
+          "autoincrement": true,
+          "name": "id_version",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_odontograma": {
+          "autoincrement": false,
+          "name": "id_odontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_version": {
+          "autoincrement": false,
+          "name": "numero_version",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "autoincrement": false,
+          "name": "snapshot",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_creacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_creacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creado_por": {
+          "autoincrement": false,
+          "name": "creado_por",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "odontograma_versiones_id_version": {
+          "name": "odontograma_versiones_id_version",
+          "columns": [
+            "id_version"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_odover_odontograma": {
+          "name": "fk_odover_odontograma",
+          "tableFrom": "odontograma_versiones",
+          "tableTo": "odontogramas",
+          "columnsFrom": [
+            "id_odontograma"
+          ],
+          "columnsTo": [
+            "id_odontograma"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_odover_usuario": {
+          "name": "fk_odover_usuario",
+          "tableFrom": "odontograma_versiones",
+          "tableTo": "usuarios_login",
+          "columnsFrom": [
+            "creado_por"
+          ],
+          "columnsTo": [
+            "id_usuario"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "odontogramas": {
+      "name": "odontogramas",
+      "columns": {
+        "id_odontograma": {
+          "autoincrement": true,
+          "name": "id_odontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "version",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado": {
+          "default": "'Activo'",
+          "autoincrement": false,
+          "name": "estado",
+          "type": "enum('Activo','Archivado')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nota_cierre": {
+          "autoincrement": false,
+          "name": "nota_cierre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_creacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_creacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "odontogramas_id_odontograma": {
+          "name": "odontogramas_id_odontograma",
+          "columns": [
+            "id_odontograma"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_odontograma_clinica": {
+          "name": "fk_odontograma_clinica",
+          "tableFrom": "odontogramas",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_odontograma_paciente": {
+          "name": "fk_odontograma_paciente",
+          "tableFrom": "odontogramas",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "paciente_atributos_extra": {
+      "name": "paciente_atributos_extra",
+      "columns": {
+        "id_attr": {
+          "autoincrement": true,
+          "name": "id_attr",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clave": {
+          "autoincrement": false,
+          "name": "clave",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "autoincrement": false,
+          "name": "valor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "paciente_atributos_extra_id_attr": {
+          "name": "paciente_atributos_extra_id_attr",
+          "columns": [
+            "id_attr"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_attr_paciente": {
+          "name": "fk_attr_paciente",
+          "tableFrom": "paciente_atributos_extra",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "pacientes": {
+      "name": "pacientes",
+      "columns": {
+        "id_paciente": {
+          "autoincrement": true,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "apellido_paterno": {
+          "autoincrement": false,
+          "name": "apellido_paterno",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apellido_materno": {
+          "autoincrement": false,
+          "name": "apellido_materno",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_nacimiento": {
+          "autoincrement": false,
+          "name": "fecha_nacimiento",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sexo": {
+          "default": "'Otro'",
+          "autoincrement": false,
+          "name": "sexo",
+          "type": "enum('M','F','Otro')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefono": {
+          "autoincrement": false,
+          "name": "telefono",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "correo": {
+          "autoincrement": false,
+          "name": "correo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "autoincrement": false,
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "escolaridad": {
+          "autoincrement": false,
+          "name": "escolaridad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ocupacion": {
+          "autoincrement": false,
+          "name": "ocupacion",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requiere_tutor": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "requiere_tutor",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nombre_tutor": {
+          "autoincrement": false,
+          "name": "nombre_tutor",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefono_tutor": {
+          "autoincrement": false,
+          "name": "telefono_tutor",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "default": "'draft'",
+          "autoincrement": false,
+          "name": "status",
+          "type": "enum('draft','completed')",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "pacientes_id_paciente": {
+          "name": "pacientes_id_paciente",
+          "columns": [
+            "id_paciente"
+          ]
+        }
+      },
+      "indexes": {
+        "id_clinica": {
+          "name": "id_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_pacientes_clinica": {
+          "name": "fk_pacientes_clinica",
+          "tableFrom": "pacientes",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "pacientes_login": {
+      "name": "pacientes_login",
+      "columns": {
+        "id_paciente_login": {
+          "autoincrement": true,
+          "name": "id_paciente_login",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usuario": {
+          "autoincrement": false,
+          "name": "usuario",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "autoincrement": false,
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ultimo_acceso": {
+          "autoincrement": false,
+          "name": "ultimo_acceso",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "pacientes_login_id_paciente_login": {
+          "name": "pacientes_login_id_paciente_login",
+          "columns": [
+            "id_paciente_login"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_pacienteslogin_clinica": {
+          "name": "fk_pacienteslogin_clinica",
+          "tableFrom": "pacientes_login",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_pacienteslogin_paciente": {
+          "name": "fk_pacienteslogin_paciente",
+          "tableFrom": "pacientes_login",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "uq_pacientes_login": {
+          "name": "uq_pacientes_login",
+          "columns": [
+            "usuario",
+            "id_clinica"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "pagos": {
+      "name": "pagos",
+      "columns": {
+        "id_pago": {
+          "autoincrement": true,
+          "name": "id_pago",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_cuota": {
+          "autoincrement": false,
+          "name": "id_cuota",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_plan": {
+          "autoincrement": false,
+          "name": "id_plan",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monto": {
+          "autoincrement": false,
+          "name": "monto",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metodo_pago": {
+          "default": "'Efectivo'",
+          "autoincrement": false,
+          "name": "metodo_pago",
+          "type": "enum('Efectivo','Tarjeta','Transferencia')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_pago": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_pago",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referencia": {
+          "autoincrement": false,
+          "name": "referencia",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nota": {
+          "autoincrement": false,
+          "name": "nota",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "pagos_id_pago": {
+          "name": "pagos_id_pago",
+          "columns": [
+            "id_pago"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_pagos_clinica": {
+          "name": "fk_pagos_clinica",
+          "tableFrom": "pagos",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_pagos_cuota": {
+          "name": "fk_pagos_cuota",
+          "tableFrom": "pagos",
+          "tableTo": "cuotas_tratamiento",
+          "columnsFrom": [
+            "id_cuota"
+          ],
+          "columnsTo": [
+            "id_cuota"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "fk_pagos_paciente": {
+          "name": "fk_pagos_paciente",
+          "tableFrom": "pagos",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_pagos_plan": {
+          "name": "fk_pagos_plan",
+          "tableFrom": "pagos",
+          "tableTo": "plan_tratamiento",
+          "columnsFrom": [
+            "id_plan"
+          ],
+          "columnsTo": [
+            "id_plan"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "periodontograma_detalles": {
+      "name": "periodontograma_detalles",
+      "columns": {
+        "id_detalle": {
+          "autoincrement": true,
+          "name": "id_detalle",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_periodontograma": {
+          "autoincrement": false,
+          "name": "id_periodontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_diente": {
+          "autoincrement": false,
+          "name": "numero_diente",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cara": {
+          "autoincrement": false,
+          "name": "cara",
+          "type": "enum('V','L')",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "margen_m": {
+          "autoincrement": false,
+          "name": "margen_m",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "margen_c": {
+          "autoincrement": false,
+          "name": "margen_c",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "margen_d": {
+          "autoincrement": false,
+          "name": "margen_d",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sondaje_m": {
+          "autoincrement": false,
+          "name": "sondaje_m",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sondaje_c": {
+          "autoincrement": false,
+          "name": "sondaje_c",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sondaje_d": {
+          "autoincrement": false,
+          "name": "sondaje_d",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sangrado_m": {
+          "autoincrement": false,
+          "name": "sangrado_m",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sangrado_c": {
+          "autoincrement": false,
+          "name": "sangrado_c",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sangrado_d": {
+          "autoincrement": false,
+          "name": "sangrado_d",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "supuracion_m": {
+          "autoincrement": false,
+          "name": "supuracion_m",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "supuracion_c": {
+          "autoincrement": false,
+          "name": "supuracion_c",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "supuracion_d": {
+          "autoincrement": false,
+          "name": "supuracion_d",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "placa_m": {
+          "autoincrement": false,
+          "name": "placa_m",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "placa_c": {
+          "autoincrement": false,
+          "name": "placa_c",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "placa_d": {
+          "autoincrement": false,
+          "name": "placa_d",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "implante": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "implante",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "movilidad": {
+          "autoincrement": false,
+          "name": "movilidad",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "furca": {
+          "autoincrement": false,
+          "name": "furca",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "encia_queratinizada": {
+          "autoincrement": false,
+          "name": "encia_queratinizada",
+          "type": "decimal(4,1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "periodontograma_detalles_id_detalle": {
+          "name": "periodontograma_detalles_id_detalle",
+          "columns": [
+            "id_detalle"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_detalle_perio": {
+          "name": "idx_detalle_perio",
+          "columns": [
+            "id_periodontograma"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_detalle_perio": {
+          "name": "fk_detalle_perio",
+          "tableFrom": "periodontograma_detalles",
+          "tableTo": "periodontogramas",
+          "columnsFrom": [
+            "id_periodontograma"
+          ],
+          "columnsTo": [
+            "id_periodontograma"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "id_periodontograma": {
+          "name": "id_periodontograma",
+          "columns": [
+            "id_periodontograma",
+            "numero_diente",
+            "cara"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "periodontogramas": {
+      "name": "periodontogramas",
+      "columns": {
+        "id_periodontograma": {
+          "autoincrement": true,
+          "name": "id_periodontograma",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_registro": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_registro",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado": {
+          "default": "'draft'",
+          "autoincrement": false,
+          "name": "estado",
+          "type": "enum('draft','completed')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notas": {
+          "autoincrement": false,
+          "name": "notas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "periodontogramas_id_periodontograma": {
+          "name": "periodontogramas_id_periodontograma",
+          "columns": [
+            "id_periodontograma"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_paciente": {
+          "name": "idx_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        },
+        "idx_clinica": {
+          "name": "idx_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        },
+        "idx_perio_paciente": {
+          "name": "idx_perio_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        },
+        "idx_perio_clinica": {
+          "name": "idx_perio_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_perio_clinica": {
+          "name": "fk_perio_clinica",
+          "tableFrom": "periodontogramas",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_perio_dentista": {
+          "name": "fk_perio_dentista",
+          "tableFrom": "periodontogramas",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fk_perio_paciente": {
+          "name": "fk_perio_paciente",
+          "tableFrom": "periodontogramas",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "permisos": {
+      "name": "permisos",
+      "columns": {
+        "id_permiso": {
+          "autoincrement": true,
+          "name": "id_permiso",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "permisos_id_permiso": {
+          "name": "permisos_id_permiso",
+          "columns": [
+            "id_permiso"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "plan_tratamiento": {
+      "name": "plan_tratamiento",
+      "columns": {
+        "id_plan": {
+          "autoincrement": true,
+          "name": "id_plan",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre_plan": {
+          "autoincrement": false,
+          "name": "nombre_plan",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_inicio": {
+          "autoincrement": false,
+          "name": "fecha_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_fin_estimada": {
+          "autoincrement": false,
+          "name": "fecha_fin_estimada",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "costo_total_inicial": {
+          "default": "'0.00'",
+          "autoincrement": false,
+          "name": "costo_total_inicial",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "costo_ajustado": {
+          "default": "'0.00'",
+          "autoincrement": false,
+          "name": "costo_ajustado",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "razon_ajuste": {
+          "autoincrement": false,
+          "name": "razon_ajuste",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plan_pago": {
+          "default": "'Pago unico'",
+          "autoincrement": false,
+          "name": "plan_pago",
+          "type": "enum('Pago unico','Cuotas')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado": {
+          "default": "'En Progreso'",
+          "autoincrement": false,
+          "name": "estado",
+          "type": "enum('En Progreso','Completado','Cancelado')",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "plan_tratamiento_id_plan": {
+          "name": "plan_tratamiento_id_plan",
+          "columns": [
+            "id_plan"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_plan_paciente": {
+          "name": "idx_plan_paciente",
+          "columns": [
+            "id_paciente"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_plan_clinica": {
+          "name": "fk_plan_clinica",
+          "tableFrom": "plan_tratamiento",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_plan_dentista": {
+          "name": "fk_plan_dentista",
+          "tableFrom": "plan_tratamiento",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "fk_plan_paciente": {
+          "name": "fk_plan_paciente",
+          "tableFrom": "plan_tratamiento",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "plan_tratamiento_procedimientos": {
+      "name": "plan_tratamiento_procedimientos",
+      "columns": {
+        "id_procedimiento": {
+          "autoincrement": true,
+          "name": "id_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_plan": {
+          "autoincrement": false,
+          "name": "id_plan",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_catalogo_procedimiento": {
+          "autoincrement": false,
+          "name": "id_catalogo_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "default": "'Pendiente'",
+          "autoincrement": false,
+          "name": "status",
+          "type": "enum('Pendiente','Realizado')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cantidad": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "cantidad",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "precio_unitario": {
+          "autoincrement": false,
+          "name": "precio_unitario",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "plan_tratamiento_procedimientos_id_procedimiento": {
+          "name": "plan_tratamiento_procedimientos_id_procedimiento",
+          "columns": [
+            "id_procedimiento"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_ptp_catalogo": {
+          "name": "fk_ptp_catalogo",
+          "tableFrom": "plan_tratamiento_procedimientos",
+          "tableTo": "catalogo_procedimientos",
+          "columnsFrom": [
+            "id_catalogo_procedimiento"
+          ],
+          "columnsTo": [
+            "id_catalogo_procedimiento"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "fk_ptp_clinica": {
+          "name": "fk_ptp_clinica",
+          "tableFrom": "plan_tratamiento_procedimientos",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_ptp_paciente": {
+          "name": "fk_ptp_paciente",
+          "tableFrom": "plan_tratamiento_procedimientos",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_ptp_plan": {
+          "name": "fk_ptp_plan",
+          "tableFrom": "plan_tratamiento_procedimientos",
+          "tableTo": "plan_tratamiento",
+          "columnsFrom": [
+            "id_plan"
+          ],
+          "columnsTo": [
+            "id_plan"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "precios_procedimientos": {
+      "name": "precios_procedimientos",
+      "columns": {
+        "id_precio": {
+          "autoincrement": true,
+          "name": "id_precio",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_catalogo_procedimiento": {
+          "autoincrement": false,
+          "name": "id_catalogo_procedimiento",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "precio": {
+          "autoincrement": false,
+          "name": "precio",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "precios_procedimientos_id_precio": {
+          "name": "precios_procedimientos_id_precio",
+          "columns": [
+            "id_precio"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_precio_catalogo": {
+          "name": "fk_precio_catalogo",
+          "tableFrom": "precios_procedimientos",
+          "tableTo": "catalogo_procedimientos",
+          "columnsFrom": [
+            "id_catalogo_procedimiento"
+          ],
+          "columnsTo": [
+            "id_catalogo_procedimiento"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "id_catalogo_procedimiento": {
+          "name": "id_catalogo_procedimiento",
+          "columns": [
+            "id_catalogo_procedimiento"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "productos": {
+      "name": "productos",
+      "columns": {
+        "id_producto": {
+          "autoincrement": true,
+          "name": "id_producto",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unidad_medida": {
+          "autoincrement": false,
+          "name": "unidad_medida",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "costo_unitario": {
+          "default": "'0.00'",
+          "autoincrement": false,
+          "name": "costo_unitario",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "productos_id_producto": {
+          "name": "productos_id_producto",
+          "columns": [
+            "id_producto"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_prod_clinica": {
+          "name": "idx_prod_clinica",
+          "columns": [
+            "id_clinica"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_productos_clinica": {
+          "name": "fk_productos_clinica",
+          "tableFrom": "productos",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "recibos": {
+      "name": "recibos",
+      "columns": {
+        "id_recibo": {
+          "autoincrement": true,
+          "name": "id_recibo",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_pago": {
+          "autoincrement": false,
+          "name": "id_pago",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_paciente": {
+          "autoincrement": false,
+          "name": "id_paciente",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_recibo": {
+          "autoincrement": false,
+          "name": "numero_recibo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_emision": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "fecha_emision",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_comprobante": {
+          "default": "'Recibo'",
+          "autoincrement": false,
+          "name": "tipo_comprobante",
+          "type": "enum('Recibo','Comprobante')",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total": {
+          "autoincrement": false,
+          "name": "total",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "archivo_url": {
+          "autoincrement": false,
+          "name": "archivo_url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "generado_por": {
+          "autoincrement": false,
+          "name": "generado_por",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notas": {
+          "autoincrement": false,
+          "name": "notas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "recibos_id_recibo": {
+          "name": "recibos_id_recibo",
+          "columns": [
+            "id_recibo"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_recibos_paciente": {
+          "name": "fk_recibos_paciente",
+          "tableFrom": "recibos",
+          "tableTo": "pacientes",
+          "columnsFrom": [
+            "id_paciente"
+          ],
+          "columnsTo": [
+            "id_paciente"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_recibos_pago": {
+          "name": "fk_recibos_pago",
+          "tableFrom": "recibos",
+          "tableTo": "pagos",
+          "columnsFrom": [
+            "id_pago"
+          ],
+          "columnsTo": [
+            "id_pago"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "rol_permiso": {
+      "name": "rol_permiso",
+      "columns": {
+        "id_rol": {
+          "autoincrement": false,
+          "name": "id_rol",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_permiso": {
+          "autoincrement": false,
+          "name": "id_permiso",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "rol_permiso_id_rol_id_permiso": {
+          "name": "rol_permiso_id_rol_id_permiso",
+          "columns": [
+            "id_rol",
+            "id_permiso"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_rolperm_permiso": {
+          "name": "fk_rolperm_permiso",
+          "tableFrom": "rol_permiso",
+          "tableTo": "permisos",
+          "columnsFrom": [
+            "id_permiso"
+          ],
+          "columnsTo": [
+            "id_permiso"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_rolperm_rol": {
+          "name": "fk_rolperm_rol",
+          "tableFrom": "rol_permiso",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "id_rol"
+          ],
+          "columnsTo": [
+            "id_rol"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "roles": {
+      "name": "roles",
+      "columns": {
+        "id_rol": {
+          "autoincrement": true,
+          "name": "id_rol",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nombre_rol": {
+          "autoincrement": false,
+          "name": "nombre_rol",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "autoincrement": false,
+          "name": "descripcion",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "es_base": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "es_base",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "roles_id_rol": {
+          "name": "roles_id_rol",
+          "columns": [
+            "id_rol"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_roles_clinica": {
+          "name": "fk_roles_clinica",
+          "tableFrom": "roles",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "stock_actual": {
+      "name": "stock_actual",
+      "columns": {
+        "id_stock": {
+          "autoincrement": true,
+          "name": "id_stock",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_producto": {
+          "autoincrement": false,
+          "name": "id_producto",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_lote": {
+          "autoincrement": false,
+          "name": "id_lote",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_disponible": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "stock_disponible",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ultima_actualizacion": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "ultima_actualizacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "onUpdate": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "stock_actual_id_stock": {
+          "name": "stock_actual_id_stock",
+          "columns": [
+            "id_stock"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_stock_lote": {
+          "name": "fk_stock_lote",
+          "tableFrom": "stock_actual",
+          "tableTo": "lotes_productos",
+          "columnsFrom": [
+            "id_lote"
+          ],
+          "columnsTo": [
+            "id_lote"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "fk_stock_producto": {
+          "name": "fk_stock_producto",
+          "tableFrom": "stock_actual",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "id_producto"
+          ],
+          "columnsTo": [
+            "id_producto"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "id_producto": {
+          "name": "id_producto",
+          "columns": [
+            "id_producto",
+            "id_lote"
+          ]
+        },
+        "uniq_stock": {
+          "name": "uniq_stock",
+          "columns": [
+            "id_producto",
+            "id_lote",
+            "id_clinica"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "tipo_antecedente": {
+      "name": "tipo_antecedente",
+      "columns": {
+        "id_tipo": {
+          "autoincrement": true,
+          "name": "id_tipo",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "autoincrement": false,
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "autoincrement": false,
+          "name": "tipo",
+          "type": "enum('patologico','no_patologico')",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "tipo_antecedente_id_tipo": {
+          "name": "tipo_antecedente_id_tipo",
+          "columns": [
+            "id_tipo"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "usuarios_login": {
+      "name": "usuarios_login",
+      "columns": {
+        "id_usuario": {
+          "autoincrement": true,
+          "name": "id_usuario",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_clinica": {
+          "autoincrement": false,
+          "name": "id_clinica",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_dentista": {
+          "autoincrement": false,
+          "name": "id_dentista",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usuario": {
+          "autoincrement": false,
+          "name": "usuario",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "autoincrement": false,
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id_rol": {
+          "autoincrement": false,
+          "name": "id_rol",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ultimo_acceso": {
+          "autoincrement": false,
+          "name": "ultimo_acceso",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "activo",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "usuarios_login_id_usuario": {
+          "name": "usuarios_login_id_usuario",
+          "columns": [
+            "id_usuario"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_usuarios_clinica": {
+          "name": "fk_usuarios_clinica",
+          "tableFrom": "usuarios_login",
+          "tableTo": "clinicas",
+          "columnsFrom": [
+            "id_clinica"
+          ],
+          "columnsTo": [
+            "id_clinica"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "fk_usuarios_dentista": {
+          "name": "fk_usuarios_dentista",
+          "tableFrom": "usuarios_login",
+          "tableTo": "dentistas",
+          "columnsFrom": [
+            "id_dentista"
+          ],
+          "columnsTo": [
+            "id_dentista"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "fk_usuarios_idrol": {
+          "name": "fk_usuarios_idrol",
+          "tableFrom": "usuarios_login",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "id_rol"
+          ],
+          "columnsTo": [
+            "id_rol"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {
+        "uq_usuarios_login": {
+          "name": "uq_usuarios_login",
+          "columns": [
+            "usuario",
+            "id_clinica"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {
+      "antecedentes": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "archivos_clinicas": {
+        "columns": {
+          "fecha_subida": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "auditoria": {
+        "columns": {
+          "fecha": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "clinicas": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "configuracion_clinica": {
+        "columns": {
+          "fecha_actualizacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "consultas": {
+        "columns": {
+          "fecha_consulta": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "dentistas": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "movimientos_inventario": {
+        "columns": {
+          "fecha_movimiento": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "odontograma_diagnosticos": {
+        "columns": {
+          "fecha_actualizacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "odontograma_procedimientos": {
+        "columns": {
+          "fecha_realizacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "odontograma_versiones": {
+        "columns": {
+          "fecha_creacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "odontogramas": {
+        "columns": {
+          "fecha_creacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "paciente_atributos_extra": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "pacientes": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "pagos": {
+        "columns": {
+          "fecha_pago": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "periodontogramas": {
+        "columns": {
+          "fecha_registro": {
+            "isDefaultAnExpression": true
+          },
+          "created_at": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "recibos": {
+        "columns": {
+          "fecha_emision": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "stock_actual": {
+        "columns": {
+          "ultima_actualizacion": {
+            "isDefaultAnExpression": true
+          }
+        }
+      }
+    },
+    "indexes": {}
+  }
+}

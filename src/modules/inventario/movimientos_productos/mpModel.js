@@ -1,65 +1,76 @@
-const db = require('../../../config/db');
+const db = require('../../../db/index');
+const { eq, desc } = require('drizzle-orm');
+const { movimientosInventario, productos, lotesProductos } = require('../../../db/schema');
 
 const MovimientosInventario = {
     async getByClinica(id_clinica) {
-        const [rows] = await db.query(
-            `SELECT 
-            mi.*,
-            p.nombre AS nombre_producto,
-            p.unidad_medida,
-            lp.numero_lote,
-            lp.fecha_caducidad
-        FROM movimientos_inventario mi
-        INNER JOIN productos p 
-            ON p.id_producto = mi.id_producto
-        LEFT JOIN lotes_productos lp 
-            ON lp.id_lote = mi.id_lote
-        WHERE mi.id_clinica = ?
-        ORDER BY mi.fecha_movimiento DESC`,
-            [id_clinica]
-        );
+        const result = await db.select({
+            id_movimiento: movimientosInventario.idMovimiento,
+            id_producto: movimientosInventario.idProducto,
+            id_clinica: movimientosInventario.idClinica,
+            id_lote: movimientosInventario.idLote,
+            tipo: movimientosInventario.tipo,
+            cantidad: movimientosInventario.cantidad,
+            motivo: movimientosInventario.motivo,
+            fecha_movimiento: movimientosInventario.fechaMovimiento,
+            nombre_producto: productos.nombre,
+            unidad_medida: productos.unidadMedida,
+            numero_lote: lotesProductos.numeroLote,
+            fecha_caducidad: lotesProductos.fechaCaducidad
+        })
+            .from(movimientosInventario)
+            .innerJoin(productos, eq(productos.idProducto, movimientosInventario.idProducto))
+            .leftJoin(lotesProductos, eq(lotesProductos.idLote, movimientosInventario.idLote))
+            .where(eq(movimientosInventario.idClinica, id_clinica))
+            .orderBy(desc(movimientosInventario.fechaMovimiento));
 
-        return rows;
+        return result;
     },
 
     async getById(id_movimiento) {
-        const [rows] = await db.query(
-            `SELECT 
-            mi.*,
-            p.nombre AS nombre_producto,
-            p.unidad_medida,
-            lp.numero_lote,
-            lp.fecha_caducidad
-        FROM movimientos_inventario mi
-        INNER JOIN productos p 
-            ON p.id_producto = mi.id_producto
-        LEFT JOIN lotes_productos lp 
-            ON lp.id_lote = mi.id_lote
-        WHERE mi.id_movimiento = ?`,
-            [id_movimiento]
-        );
+        const result = await db.select({
+            id_movimiento: movimientosInventario.idMovimiento,
+            id_producto: movimientosInventario.idProducto,
+            id_clinica: movimientosInventario.idClinica,
+            id_lote: movimientosInventario.idLote,
+            tipo: movimientosInventario.tipo,
+            cantidad: movimientosInventario.cantidad,
+            motivo: movimientosInventario.motivo,
+            fecha_movimiento: movimientosInventario.fechaMovimiento,
+            nombre_producto: productos.nombre,
+            unidad_medida: productos.unidadMedida,
+            numero_lote: lotesProductos.numeroLote,
+            fecha_caducidad: lotesProductos.fechaCaducidad
+        })
+            .from(movimientosInventario)
+            .innerJoin(productos, eq(productos.idProducto, movimientosInventario.idProducto))
+            .leftJoin(lotesProductos, eq(lotesProductos.idLote, movimientosInventario.idLote))
+            .where(eq(movimientosInventario.idMovimiento, id_movimiento));
 
-        return rows[0];
+        return result[0];
     },
 
     async getByIdProducto(id_producto) {
-        const [rows] = await db.query(
-            `SELECT 
-            mi.*,
-            p.nombre AS nombre_producto,
-            lp.numero_lote,
-            lp.fecha_caducidad
-        FROM movimientos_inventario mi
-        INNER JOIN productos p 
-            ON p.id_producto = mi.id_producto
-        LEFT JOIN lotes_productos lp 
-            ON lp.id_lote = mi.id_lote
-        WHERE mi.id_producto = ?
-        ORDER BY mi.fecha_movimiento DESC`,
-            [id_producto]
-        );
+        const result = await db.select({
+            id_movimiento: movimientosInventario.idMovimiento,
+            id_producto: movimientosInventario.idProducto,
+            id_clinica: movimientosInventario.idClinica,
+            id_lote: movimientosInventario.idLote,
+            tipo: movimientosInventario.tipo,
+            cantidad: movimientosInventario.cantidad,
+            motivo: movimientosInventario.motivo,
+            fecha_movimiento: movimientosInventario.fechaMovimiento,
+            nombre_producto: productos.nombre,
+            numero_lote: lotesProductos.numeroLote,
+            fecha_caducidad: lotesProductos.fechaCaducidad
+        })
+            .from(movimientosInventario)
+            .innerJoin(productos, eq(productos.idProducto, movimientosInventario.idProducto))
+            .leftJoin(lotesProductos, eq(lotesProductos.idLote, movimientosInventario.idLote))
+            .where(eq(movimientosInventario.idProducto, id_producto))
+            .orderBy(desc(movimientosInventario.fechaMovimiento));
 
-        return rows;
+        return result;
     },
 
     async create(data) {
@@ -72,12 +83,14 @@ const MovimientosInventario = {
             motivo
         } = data;
 
-        const [result] = await db.query(
-            `INSERT INTO movimientos_inventario
-       (id_producto, id_clinica, id_lote, tipo, cantidad, motivo)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-            [id_producto, id_clinica, id_lote || null, tipo, cantidad, motivo || null]
-        );
+        const [result] = await db.insert(movimientosInventario).values({
+            idProducto: id_producto,
+            idClinica: id_clinica,
+            idLote: id_lote || null,
+            tipo: tipo,
+            cantidad: cantidad,
+            motivo: motivo || null
+        });
 
         return result.insertId;
     },
@@ -92,19 +105,20 @@ const MovimientosInventario = {
             motivo
         } = data;
 
-        await db.query(
-            `UPDATE movimientos_inventario
-       SET id_producto = ?, id_clinica = ?, id_lote = ?, tipo = ?, cantidad = ?, motivo = ?
-       WHERE id_movimiento = ?`,
-            [id_producto, id_clinica, id_lote || null, tipo, cantidad, motivo || null, id]
-        );
+        await db.update(movimientosInventario)
+            .set({
+                idProducto: id_producto,
+                idClinica: id_clinica,
+                idLote: id_lote || null,
+                tipo: tipo,
+                cantidad: cantidad,
+                motivo: motivo || null
+            })
+            .where(eq(movimientosInventario.idMovimiento, id));
     },
 
     async delete(id) {
-        await db.query(
-            `DELETE FROM movimientos_inventario WHERE id_movimiento = ?`,
-            [id]
-        );
+        await db.delete(movimientosInventario).where(eq(movimientosInventario.idMovimiento, id));
     }
 };
 

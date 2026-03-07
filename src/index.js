@@ -24,15 +24,18 @@ const productosRoutes = require('./modules/inventario/productos/productosRoutes'
 const lotesRoutes = require('./modules/inventario/lotes/lotesRoutes');
 const ConfiguracionClinica = require('./modules/clinica/configuracion_clinica/configuracionClinicaRoutes');
 const movimientosProductosRoutes = require('./modules/inventario/movimientos_productos/mpRoutes');
-const rolesRoutes = require('./routes/rolesRoutes'); 
+const rolesRoutes = require('./routes/rolesRoutes');
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const archivosRoutes = require("./modules/archivos/archivosRoutes");
+const periodontogramasRoutes = require('./modules/periodontogramas/periodontogramasRoutes');
+const metricsRoutes = require('./modules/metrics/metricsRoutes');
+const ausenciasRoutes = require('./modules/ausencias/ausenciasRoutes');
 const app = express();
 
 app.use(
-    helmet({
-      crossOriginResourcePolicy: false,
-    })
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
 );
 
 app.use((req, res, next) => {
@@ -72,6 +75,9 @@ app.use('/configuracionClinica', ConfiguracionClinica);
 app.use('/movimientos-productos', movimientosProductosRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/usuarios', usuariosRoutes);
+app.use('/periodontogramas', periodontogramasRoutes);
+app.use('/metrics', metricsRoutes);
+app.use('/ausencias', ausenciasRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
 app.use('/uploads', cors(corsOptions), express.static('uploads'));
 app.use("/api/archivos", archivosRoutes);

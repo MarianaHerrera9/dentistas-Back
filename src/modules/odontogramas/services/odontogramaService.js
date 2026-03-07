@@ -1,33 +1,25 @@
-const db = require("../../../config/db");
+const db = require("../../../db/index");
 const Odontograma = require("../models/odontogramaModel");
+const { eq, and } = require("drizzle-orm");
+const { odontogramas } = require("../../../db/schema");
 
 const OdontogramaService = {
     async createNewOdontograma(data) {
         const { id_paciente } = data;
-        const connection = await db.getConnection();
 
-        try {
-            await connection.beginTransaction();
+        return await db.transaction(async (tx) => {
+            await tx.update(odontogramas)
+                .set({ estado: 'Archivado' })
+                .where(
+                    and(
+                        eq(odontogramas.idPaciente, id_paciente),
+                        eq(odontogramas.estado, 'Activo')
+                    )
+                );
 
-            await connection.query(
-                `UPDATE odontogramas
-             SET estado = 'Archivado'
-             WHERE id_paciente = ? AND estado = 'Activo'`,
-                [id_paciente]
-            );
-
-            const odontogramaId = await Odontograma.create(data, connection);
-
-            await connection.commit();
+            const odontogramaId = await Odontograma.create(data, tx);
             return odontogramaId;
-
-        } catch (error) {
-            await connection.rollback();
-            throw error;
-
-        } finally {
-            connection.release();
-        }
+        });
     }
 };
 
