@@ -508,7 +508,6 @@ const pacientes = (0, import_mysql_core.mysqlTable)(
     requiereTutor: (0, import_mysql_core.tinyint)("requiere_tutor").default(0),
     nombreTutor: (0, import_mysql_core.varchar)("nombre_tutor", { length: 200 }),
     telefonoTutor: (0, import_mysql_core.varchar)("telefono_tutor", { length: 15 }),
-    status: (0, import_mysql_core.mysqlEnum)(["draft", "completed"]).default("draft"),
     canalAdquisicion: (0, import_mysql_core.varchar)("canal_adquisicion", { length: 100 })
   },
   (table) => [
