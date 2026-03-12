@@ -22,7 +22,7 @@ const Tratamiento = {
                 costoTotalInicial: data.costo_total_inicial ?? 0,
                 costoAjustado: data.costo_ajustado ?? 0,
                 razonAjuste: data.razon_ajuste ?? null,
-                planPago: data.plan_pago ?? 'Pago único',
+                planPago: data.plan_pago ?? 'Pago unico',
                 estado: data.estado ?? 'En Progreso'
             });
 
@@ -123,6 +123,9 @@ const Tratamiento = {
         return plans.map(plan => ({
             ...plan,
             id_plan: plan.idPlan, // map camelcase to original property format
+            nombre_plan: plan.nombrePlan,
+            plan_pago: plan.planPago,
+            costo_ajustado: plan.costoAjustado,
             procedimientos: procedimientosResult.filter(p => p.id_plan === plan.idPlan),
             total_pagado: pagosResult.find(p => p.id_plan === plan.idPlan)?.total_pagado || 0
         }));
@@ -136,7 +139,7 @@ const Tratamiento = {
             costoTotalInicial: data.costo_total_inicial ?? 0,
             costoAjustado: data.costo_ajustado ?? 0,
             razonAjuste: data.razon_ajuste ?? null,
-            planPago: data.plan_pago ?? 'Pago único',
+            planPago: data.plan_pago ?? 'Pago unico',
             estado: data.estado ?? 'En Progreso'
         })
             .where(eq(planTratamiento.idPlan, id_plan));

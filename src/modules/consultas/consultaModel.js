@@ -12,8 +12,7 @@ const cCols = {
   examen_intraoral: consultas.examenIntraoral,
   fecha_consulta: consultas.fechaConsulta,
   proxima_cita: consultas.proximaCita,
-  notas: consultas.notas,
-  estado: consultas.estado
+  notas: consultas.notas
 };
 
 const Consulta = {
@@ -52,13 +51,8 @@ const Consulta = {
       dentista_nombre: sql`CONCAT(${dentistas.nombre}, ' ', IFNULL(${dentistas.apellidoPaterno}, ''), ' ', IFNULL(${dentistas.apellidoMaterno}, ''))`
     })
       .from(consultas)
-      .innerJoin(dentistas, eq(dentistas.idDentista, consultas.idDentista))
-      .where(
-        and(
-          eq(consultas.idPaciente, id_paciente),
-          eq(dentistas.activo, 1)
-        )
-      )
+      .leftJoin(dentistas, eq(dentistas.idDentista, consultas.idDentista))
+      .where(eq(consultas.idPaciente, id_paciente))
       .orderBy(desc(consultas.fechaConsulta));
 
     return result;
