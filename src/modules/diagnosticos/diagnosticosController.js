@@ -4,7 +4,8 @@ const CatalogoDiagnosticosController = {
 
     getAll: async (req, res) => {
         try {
-            const data = await CatalogoDiagnosticosModel.findAll();
+            const idClinica = req.user?.id_clinica;
+            const data = await CatalogoDiagnosticosModel.findAll(idClinica);
             res.json(data);
         } catch (err) {
             console.error(err);
@@ -28,7 +29,11 @@ const CatalogoDiagnosticosController = {
 
     create: async (req, res) => {
         try {
-            const id = await CatalogoDiagnosticosModel.create(req.body);
+            const data = {
+                ...req.body,
+                id_clinica: req.body.id_clinica || req.user?.id_clinica
+            };
+            const id = await CatalogoDiagnosticosModel.create(data);
             res.json({ id, message: "Creado correctamente" });
         } catch (err) {
             console.error(err);
@@ -38,7 +43,11 @@ const CatalogoDiagnosticosController = {
 
     update: async (req, res) => {
         try {
-            await CatalogoDiagnosticosModel.update(req.params.id, req.body);
+            const data = {
+                ...req.body,
+                id_clinica: req.body.id_clinica || req.user?.id_clinica
+            };
+            await CatalogoDiagnosticosModel.update(req.params.id, data);
             res.json({ message: "Actualizado correctamente" });
         } catch (err) {
             console.error(err);

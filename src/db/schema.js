@@ -169,9 +169,11 @@ const catalogoDiagnosticos = (0, import_mysql_core.mysqlTable)(
     nombre: (0, import_mysql_core.varchar)({ length: 50 }).notNull(),
     tipo: (0, import_mysql_core.mysqlEnum)(["Diente", "Superficie"]).notNull(),
     colorIcon: (0, import_mysql_core.varchar)("color_icon", { length: 10 }),
-    simbolo: (0, import_mysql_core.varchar)({ length: 20 })
+    simbolo: (0, import_mysql_core.varchar)({ length: 20 }),
+    idClinica: (0, import_mysql_core.int)("id_clinica").references(() => clinicas.idClinica, { onDelete: "cascade" })
   },
   (table) => [
+    (0, import_mysql_core.index)("idx_diagnosticos_clinica").on(table.idClinica),
     (0, import_mysql_core.primaryKey)({ columns: [table.idDiagnostico], name: "catalogo_diagnosticos_id_diagnostico" })
   ]
 );

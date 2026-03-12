@@ -95,8 +95,10 @@ export const catalogoDiagnosticos = mysqlTable("catalogo_diagnosticos", {
 	tipo: mysqlEnum(['Diente', 'Superficie']).notNull(),
 	colorIcon: varchar("color_icon", { length: 10 }),
 	simbolo: varchar({ length: 20 }),
+	idClinica: int("id_clinica").references(() => clinicas.idClinica, { onDelete: "cascade" }),
 },
 	(table) => [
+		index("idx_diagnosticos_clinica").on(table.idClinica),
 		primaryKey({ columns: [table.idDiagnostico], name: "catalogo_diagnosticos_id_diagnostico" }),
 	]);
 
