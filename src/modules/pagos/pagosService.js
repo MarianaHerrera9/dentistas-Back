@@ -1,4 +1,4 @@
-const db = require('../../config/db');
+const db = require('../../db/index');
 const PagosModel = require('./pagosModel');
 const CuotasModel = require('../cuotas/cuotasModel');
 
@@ -32,43 +32,36 @@ const PagosService = {
             nota,
         } = data;
 
-        if (!id_paciente || !id_plan || !monto || !metodo_pago) {
-            throw new Error('Datos obligatorios incompletos');
+        if (!id_paciente || !id_plan || !monto || !metodo_pago || !id_clinica) {
+            throw new Error('Datos obligatorios incompletos (paciente, plan, monto, método o clínica)');
         }
 
-        const connection = await db.getConnection();
-
         try {
-            await connection.beginTransaction();
+            return await db.transaction(async (tx) => {
+                const pagoId = await PagosModel.create({
+                    id_cuota,
+                    id_paciente,
+                    id_plan,
+                    id_clinica,
+                    monto,
+                    metodo_pago,
+                    fecha_pago,
+                    referencia,
+                    nota,
+                }, tx);
 
-            const pagoId = await PagosModel.create({
-                id_cuota,
-                id_paciente,
-                id_plan,
-                id_clinica,
-                monto,
-                metodo_pago,
-                fecha_pago,
-                referencia,
-                nota,
-            }, connection);
+                if (id_cuota) {
+                    await CuotasModel.marcarComoPagada(id_cuota, tx);
+                }
 
-            if (id_cuota) {
-                await CuotasModel.marcarComoPagada(id_cuota, connection);
-            }
-
-            await connection.commit();
-
-            return {
-                id_pago: pagoId,
-                message: 'Pago registrado correctamente'
-            };
-
+                return {
+                    id_pago: pagoId,
+                    message: 'Pago registrado correctamente'
+                };
+            });
         } catch (error) {
-            await connection.rollback();
+            console.error("Error en createPago transaction:", error);
             throw error;
-        } finally {
-            connection.release();
         }
     },
 

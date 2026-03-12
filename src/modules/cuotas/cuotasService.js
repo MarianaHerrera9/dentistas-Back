@@ -1,5 +1,7 @@
 const CuotasModel = require('./cuotasModel');
-const db = require('../../config/db');
+const db = require('../../db/index');
+const { planTratamiento, pacientes } = require('../../db/schema');
+const { eq, and } = require('drizzle-orm');
 
 const CuotasService = {
 
@@ -77,16 +79,18 @@ const CuotasService = {
 };
 
 async function validarPlanYPaciente(id_plan, id_paciente) {
-    const [[plan]] = await db.query(
-        `SELECT id_plan FROM plan_tratamiento WHERE id_plan = ?`,
-        [id_plan]
-    );
+    const [plan] = await db.select()
+        .from(planTratamiento)
+        .where(eq(planTratamiento.idPlan, id_plan))
+        .limit(1);
+    
     if (!plan) throw new Error('El plan de tratamiento no existe');
 
-    const [[paciente]] = await db.query(
-        `SELECT id_paciente FROM pacientes WHERE id_paciente = ?`,
-        [id_paciente]
-    );
+    const [paciente] = await db.select()
+        .from(pacientes)
+        .where(eq(pacientes.idPaciente, id_paciente))
+        .limit(1);
+
     if (!paciente) throw new Error('El paciente no existe');
 }
 

@@ -12,7 +12,6 @@ const CuotasModel = {
             monto: cuotasTratamiento.monto,
             fecha_programada: cuotasTratamiento.fechaProgramada,
             pagada: cuotasTratamiento.pagada,
-            fecha_pago: cuotasTratamiento.fechaPago,
             nombre_plan: planTratamiento.nombrePlan,
             nombre_paciente: pacientes.nombre,
             apellido_paterno: pacientes.apellidoPaterno,
@@ -32,8 +31,7 @@ const CuotasModel = {
             id_paciente: cuotasTratamiento.idPaciente,
             monto: cuotasTratamiento.monto,
             fecha_programada: cuotasTratamiento.fechaProgramada,
-            pagada: cuotasTratamiento.pagada,
-            fecha_pago: cuotasTratamiento.fechaPago
+            pagada: cuotasTratamiento.pagada
         })
             .from(cuotasTratamiento)
             .where(eq(cuotasTratamiento.idCuota, id_cuota));
@@ -47,8 +45,7 @@ const CuotasModel = {
             id_paciente: cuotasTratamiento.idPaciente,
             monto: cuotasTratamiento.monto,
             fecha_programada: cuotasTratamiento.fechaProgramada,
-            pagada: cuotasTratamiento.pagada,
-            fecha_pago: cuotasTratamiento.fechaPago
+            pagada: cuotasTratamiento.pagada
         })
             .from(cuotasTratamiento)
             .where(eq(cuotasTratamiento.idPlan, id_plan))
@@ -64,7 +61,6 @@ const CuotasModel = {
             monto: cuotasTratamiento.monto,
             fecha_programada: cuotasTratamiento.fechaProgramada,
             pagada: cuotasTratamiento.pagada,
-            fecha_pago: cuotasTratamiento.fechaPago,
             nombre_plan: planTratamiento.nombrePlan
         })
             .from(cuotasTratamiento)
