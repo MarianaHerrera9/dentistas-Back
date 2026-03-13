@@ -594,6 +594,7 @@ const periodontogramas = (0, import_mysql_core.mysqlTable)(
     fechaRegistro: (0, import_mysql_core.timestamp)("fecha_registro", { mode: "string" }).defaultNow(),
     estado: (0, import_mysql_core.mysqlEnum)(["draft", "completed"]).default("draft"),
     notas: (0, import_mysql_core.text)(),
+    notaCierre: (0, import_mysql_core.text)("nota_cierre"),
     createdAt: (0, import_mysql_core.timestamp)("created_at", { mode: "string" }).defaultNow(),
     updatedAt: (0, import_mysql_core.timestamp)("updated_at", { mode: "string" })
   },

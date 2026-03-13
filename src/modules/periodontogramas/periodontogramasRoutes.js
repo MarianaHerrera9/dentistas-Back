@@ -30,6 +30,7 @@ router.patch('/:id/finalizar', authMiddleware, Controller.finalizar);
 
 // CRUD por ID (al final para no capturar rutas estáticas)
 router.get('/:id', authMiddleware, Controller.getById);
+router.put('/:id', authMiddleware, Controller.update);
 router.delete('/:id', authMiddleware, Controller.delete);
 
 module.exports = router;

@@ -78,13 +78,23 @@ const Controller = {
 
     },
 
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            const result = await Service.update(id, req.body);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
     async finalizar(req, res) {
 
         try {
 
             const { id } = req.params;
-
-            const result = await Service.finalizar(id);
+            const { nota_cierre } = req.body; // El front envía 'notas' en el body por ahora, pero lo pasamos como nota_cierre al service
+            const result = await Service.finalizar(id, nota_cierre);
 
             res.json(result);
 

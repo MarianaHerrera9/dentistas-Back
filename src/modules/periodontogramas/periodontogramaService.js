@@ -19,8 +19,13 @@ const Service = {
         return await Model.findByPaciente(idPaciente);
     },
 
-    async finalizar(id) {
-        await Model.finalizar(id);
+    async update(id, data) {
+        await Model.update(id, data);
+        return await Model.findById(id);
+    },
+
+    async finalizar(id, notas) {
+        await Model.finalizar(id, notas);
         return await Model.findById(id);
     },
 
