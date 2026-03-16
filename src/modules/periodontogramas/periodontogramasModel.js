@@ -46,13 +46,38 @@ const PeriodontogramaModel = {
         return rows;
     },
 
-    async finalizar(id) {
+    async update(id, data) {
+        const fields = [];
+        const values = [];
+
+        if (data.estado) {
+            fields.push("estado = ?");
+            values.push(data.estado);
+        }
+        if (data.notas !== undefined) {
+            fields.push("notas = ?");
+            values.push(data.notas);
+        }
+        if (data.nota_cierre !== undefined) {
+            fields.push("nota_cierre = ?");
+            values.push(data.nota_cierre);
+        }
+
+        if (fields.length === 0) return;
+
+        values.push(id);
+        const sql = `UPDATE periodontogramas SET ${fields.join(", ")}, updated_at = NOW() WHERE id_periodontograma = ?`;
+        await db.query(sql, values);
+    },
+
+    async finalizar(id, nota_cierre) {
         await db.query(
             `UPDATE periodontogramas
        SET estado = 'completed',
+       nota_cierre = ?,
        updated_at = NOW()
        WHERE id_periodontograma = ?`,
-            [id]
+            [nota_cierre || null, id]
         );
     },
 
