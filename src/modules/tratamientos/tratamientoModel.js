@@ -5,7 +5,9 @@ const {
     planTratamientoProcedimientos,
     catalogoProcedimientos,
     preciosProcedimientos,
-    pagos
+    pagos,
+    insumosProcedimiento,
+    productos
 } = require('../../db/schema');
 
 const Tratamiento = {
@@ -65,14 +67,20 @@ const Tratamiento = {
             status: planTratamientoProcedimientos.status,
             cantidad: planTratamientoProcedimientos.cantidad,
             precio_unitario: planTratamientoProcedimientos.precioUnitario,
-            precio_base: preciosProcedimientos.precio
+            precio_base: preciosProcedimientos.precio,
+            insumo_id: insumosProcedimiento.idProducto,
+            insumo_cantidad: insumosProcedimiento.cantidad,
+            insumo_nombre: productos.nombre,
+            insumo_unidad: productos.unidadMedida
         })
             .from(planTratamientoProcedimientos)
             .innerJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
-            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, catalogoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(insumosProcedimiento, eq(insumosProcedimiento.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(productos, eq(insumosProcedimiento.idProducto, productos.idProducto))
             .where(eq(planTratamientoProcedimientos.idPlan, id_plan));
 
-        plan.procedimientos = procRows;
+        plan.procedimientos = this._transformProcedimientoRows(procRows);
 
         // Pagos
         const pagosRows = await db.select({
@@ -105,11 +113,17 @@ const Tratamiento = {
             status: planTratamientoProcedimientos.status,
             cantidad: planTratamientoProcedimientos.cantidad,
             precio_unitario: planTratamientoProcedimientos.precioUnitario,
-            precio_base: preciosProcedimientos.precio
+            precio_base: preciosProcedimientos.precio,
+            insumo_id: insumosProcedimiento.idProducto,
+            insumo_cantidad: insumosProcedimiento.cantidad,
+            insumo_nombre: productos.nombre,
+            insumo_unidad: productos.unidadMedida
         })
             .from(planTratamientoProcedimientos)
             .innerJoin(catalogoProcedimientos, eq(catalogoProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
-            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, catalogoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(preciosProcedimientos, eq(preciosProcedimientos.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(insumosProcedimiento, eq(insumosProcedimiento.idCatalogoProcedimiento, planTratamientoProcedimientos.idCatalogoProcedimiento))
+            .leftJoin(productos, eq(insumosProcedimiento.idProducto, productos.idProducto))
             .where(inArray(planTratamientoProcedimientos.idPlan, ids));
 
         const pagosResult = await db.select({
@@ -120,13 +134,15 @@ const Tratamiento = {
             .where(inArray(pagos.idPlan, ids))
             .groupBy(pagos.idPlan);
 
+        const transformedProcs = this._transformProcedimientoRows(procedimientosResult);
+
         return plans.map(plan => ({
             ...plan,
             id_plan: plan.idPlan, // map camelcase to original property format
             nombre_plan: plan.nombrePlan,
             plan_pago: plan.planPago,
             costo_ajustado: plan.costoAjustado,
-            procedimientos: procedimientosResult.filter(p => p.id_plan === plan.idPlan),
+            procedimientos: transformedProcs.filter(p => Number(p.id_plan) === Number(plan.idPlan)),
             total_pagado: pagosResult.find(p => p.id_plan === plan.idPlan)?.total_pagado || 0
         }));
     },
@@ -152,6 +168,33 @@ const Tratamiento = {
             .where(eq(planTratamiento.idPlan, id_plan));
 
         return result.affectedRows;
+    },
+
+    _transformProcedimientoRows(rows) {
+        const proceduresMap = new Map();
+        for (const row of rows) {
+            const idProc = row.id_procedimiento;
+            if (!proceduresMap.has(idProc)) {
+                proceduresMap.set(idProc, {
+                    ...row,
+                    materiales: []
+                });
+            }
+            if (row.insumo_id) {
+                proceduresMap.get(idProc).materiales.push({
+                    id_producto: row.insumo_id,
+                    cantidad: row.insumo_cantidad,
+                    producto_nombre: row.insumo_nombre,
+                    producto_unidad: row.insumo_unidad
+                });
+            }
+            // Limpiar columnas auxiliares de join
+            delete proceduresMap.get(idProc).insumo_id;
+            delete proceduresMap.get(idProc).insumo_cantidad;
+            delete proceduresMap.get(idProc).insumo_nombre;
+            delete proceduresMap.get(idProc).insumo_unidad;
+        }
+        return Array.from(proceduresMap.values());
     }
 
 };
