@@ -57,8 +57,9 @@ __export(schema_exports, {
   roles: () => roles,
   stockActual: () => stockActual,
   tipoAntecedente: () => tipoAntecedente,
-    insumosProcedimiento: () => insumosProcedimiento,
-    usuariosLogin: () => usuariosLogin
+  usuariosLogin: () => usuariosLogin,
+  salidasDinero: () => salidasDinero,
+  insumosProcedimiento: () => insumosProcedimiento,
 });
 module.exports = __toCommonJS(schema_exports);
 var import_mysql_core = require("drizzle-orm/mysql-core");
@@ -811,10 +812,28 @@ const usuariosLogin = (0, import_mysql_core.mysqlTable)(
   rolPermiso,
   roles,
   stockActual,
-  tipoAntecedente,
-  insumosProcedimiento,
-  usuariosLogin
+   tipoAntecedente,
+  usuariosLogin,
+  salidasDinero,
+  insumosProcedimiento
 });
+
+const salidasDinero = (0, import_mysql_core.mysqlTable)(
+  "salidas_dinero",
+  {
+    idSalida: (0, import_mysql_core.int)("id_salida").autoincrement().notNull(),
+    idClinica: (0, import_mysql_core.int)("id_clinica").notNull().references(() => clinicas.idClinica, { onDelete: "cascade" }),
+    motivo: (0, import_mysql_core.varchar)({ length: 255 }).notNull(),
+    monto: (0, import_mysql_core.decimal)({ precision: 10, scale: 2 }).notNull(),
+    fechaSalida: (0, import_mysql_core.date)("fecha_salida", { mode: "string" }).notNull(),
+    horaSalida: (0, import_mysql_core.time)("hora_salida").notNull(),
+    fechaRegistro: (0, import_mysql_core.timestamp)("fecha_registro", { mode: "string" }).defaultNow()
+  },
+  (table) => [
+    (0, import_mysql_core.index)("idx_salidas_clinica").on(table.idClinica),
+    (0, import_mysql_core.primaryKey)({ columns: [table.idSalida], name: "salidas_dinero_id_salida" })
+  ]
+);
 
 const insumosProcedimiento = (0, import_mysql_core.mysqlTable)(
   "insumos_procedimiento",

@@ -30,6 +30,7 @@ const archivosRoutes = require("./modules/archivos/archivosRoutes");
 const periodontogramasRoutes = require('./modules/periodontogramas/periodontogramasRoutes');
 const metricsRoutes = require('./modules/metrics/metricsRoutes');
 const ausenciasRoutes = require('./modules/ausencias/ausenciasRoutes');
+const salidasDineroRoutes = require('./modules/salidasDinero/salidasDineroRoutes');
 const app = express();
 
 app.use(
@@ -78,6 +79,7 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/periodontogramas', periodontogramasRoutes);
 app.use('/metrics', metricsRoutes);
 app.use('/ausencias', ausenciasRoutes);
+app.use('/salidas-dinero', salidasDineroRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
 app.use('/uploads', cors(corsOptions), express.static('uploads'));
 app.use("/api/archivos", archivosRoutes);
