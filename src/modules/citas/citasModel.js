@@ -156,11 +156,14 @@ const CitasModel = {
             .set({
                 fechaCita: data.fecha_cita,
                 horaInicio: data.hora_inicio,
-                horaFin: data.hora_fin
+                horaFin: data.hora_fin,
+                idProcedimiento: data.id_procedimiento,
+                notas: data.notas
             })
             .where(eq(citas.idCita, id_cita));
         return [result];
     },
+
 
     async getByPaciente(id_paciente) {
         const result = await db.select({

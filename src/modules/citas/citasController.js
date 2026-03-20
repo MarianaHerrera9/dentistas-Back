@@ -79,6 +79,16 @@ exports.reagendar = async (req, res, next) => {
     }
 };
 
+exports.update = async (req, res, next) => {
+    try {
+        await CitasService.update(req.params.id, req.body);
+        res.json({ message: 'Cita actualizada' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+
 exports.listByPaciente = async (req, res, next) => {
     try {
         const { id_paciente } = req.params;

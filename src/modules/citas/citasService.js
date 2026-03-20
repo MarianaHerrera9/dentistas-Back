@@ -118,6 +118,11 @@ const CitasService = {
         return CitasModel.update(id_cita, data);
     },
 
+    update(id_cita, data) {
+        return CitasModel.update(id_cita, data);
+    },
+
+
     getCitasByPaciente(id_paciente) {
         return CitasModel.getByPaciente(id_paciente);
     },

@@ -625,3 +625,13 @@ export const usuariosLogin = mysqlTable("usuarios_login", {
 		primaryKey({ columns: [table.idUsuario], name: "usuarios_login_id_usuario" }),
 		unique("uq_usuarios_login").on(table.usuario, table.idClinica),
 	]);
+
+export const insumosProcedimiento = mysqlTable("insumos_procedimiento", {
+	idInsumo: int("id_insumo").autoincrement().notNull(),
+	idCatalogoProcedimiento: int("id_catalogo_procedimiento").notNull().references(() => catalogoProcedimientos.idCatalogoProcedimiento, { onDelete: "cascade" }),
+	idProducto: int("id_producto").notNull().references(() => productos.idProducto, { onDelete: "cascade" }),
+	cantidad: decimal({ precision: 10, scale: 2 }).default('1.00').notNull(),
+},
+	(table) => [
+		primaryKey({ columns: [table.idInsumo], name: "insumos_procedimiento_id_insumo" }),
+	]);

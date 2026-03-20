@@ -12,6 +12,8 @@ router.patch('/:id/cancelar', authMiddleware, ctrl.cancelar);
 router.patch('/:id/confirmar', authMiddleware, ctrl.confirmar);
 router.patch('/:id/completar', authMiddleware, ctrl.completar);
 router.patch('/:id/reagendar', authMiddleware, ctrl.reagendar);
-router.get('/paciente/:id_paciente', authMiddleware,  ctrl.listByPaciente);
+router.put('/:id', authMiddleware, ctrl.update);
+
+router.get('/paciente/:id_paciente', authMiddleware, ctrl.listByPaciente);
 
 module.exports = router;
