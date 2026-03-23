@@ -45,7 +45,7 @@ exports.registroClinica = async (req, res) => {
 
     // 4. Asignar permisos a este rol
     for (let permiso of permisos) {
-      await RolPermiso.assign(id_rol, permiso.id_permiso, connection);
+      await RolPermiso.assign(id_rol, permiso.idPermiso, connection);
     }
 
     // -----------------------------------------
