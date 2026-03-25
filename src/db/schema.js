@@ -60,6 +60,8 @@ __export(schema_exports, {
   usuariosLogin: () => usuariosLogin,
   salidasDinero: () => salidasDinero,
   insumosProcedimiento: () => insumosProcedimiento,
+  presupuestos: () => presupuestos,
+  presupuestoDetalles: () => presupuestoDetalles,
 });
 module.exports = __toCommonJS(schema_exports);
 var import_mysql_core = require("drizzle-orm/mysql-core");
@@ -772,6 +774,47 @@ const usuariosLogin = (0, import_mysql_core.mysqlTable)(
   ]
 );
 // Annotate the CommonJS export names for ESM import in node:
+
+const presupuestos = (0, import_mysql_core.mysqlTable)(
+  "presupuestos",
+  {
+    idPresupuesto: (0, import_mysql_core.int)("id_presupuesto").autoincrement().notNull(),
+    idClinica: (0, import_mysql_core.int)("id_clinica").notNull().references(() => clinicas.idClinica, { onDelete: "cascade" }),
+    idPaciente: (0, import_mysql_core.int)("id_paciente").notNull().references(() => pacientes.idPaciente, { onDelete: "cascade" }),
+    idDentista: (0, import_mysql_core.int)("id_dentista").notNull().references(() => dentistas.idDentista, { onDelete: "restrict" }),
+    nombre: (0, import_mysql_core.varchar)({ length: 150 }),
+    estado: (0, import_mysql_core.mysqlEnum)("estado", ["Borrador", "Activo", "Aceptado", "Rechazado", "Vencido"]).default("Activo"),
+    descuentoPorcentaje: (0, import_mysql_core.decimal)("descuento_porcentaje", { precision: 5, scale: 2 }).default("0.00"),
+    descuentoMonto: (0, import_mysql_core.decimal)("descuento_monto", { precision: 10, scale: 2 }).default("0.00"),
+    subtotal: (0, import_mysql_core.decimal)("subtotal", { precision: 10, scale: 2 }).default("0.00"),
+    total: (0, import_mysql_core.decimal)("total", { precision: 10, scale: 2 }).default("0.00"),
+    notas: (0, import_mysql_core.text)("notas"),
+    fechaCreacion: (0, import_mysql_core.timestamp)("fecha_creacion", { mode: "string" }).defaultNow(),
+    fechaExpiracion: (0, import_mysql_core.date)("fecha_expiracion", { mode: "string" }),
+  },
+  (table) => [
+    (0, import_mysql_core.primaryKey)({ columns: [table.idPresupuesto], name: "presupuestos_id_presupuesto" })
+  ]
+);
+
+const presupuestoDetalles = (0, import_mysql_core.mysqlTable)(
+  "presupuesto_detalles",
+  {
+    idDetallePresupuesto: (0, import_mysql_core.int)("id_detalle_presupuesto").autoincrement().notNull(),
+    idPresupuesto: (0, import_mysql_core.int)("id_presupuesto").notNull().references(() => presupuestos.idPresupuesto, { onDelete: "cascade" }),
+    idCatalogoProcedimiento: (0, import_mysql_core.int)("id_catalogo_procedimiento").notNull().references(() => catalogoProcedimientos.idCatalogoProcedimiento, { onDelete: "restrict" }),
+    numeroDiente: (0, import_mysql_core.varchar)("numero_diente", { length: 8 }),
+    cantidad: (0, import_mysql_core.int)("cantidad").default(1),
+    precioUnitario: (0, import_mysql_core.decimal)("precio_unitario", { precision: 10, scale: 2 }).notNull(),
+    descuentoPorcentaje: (0, import_mysql_core.decimal)("descuento_porcentaje", { precision: 5, scale: 2 }).default("0.00"),
+    descuentoMonto: (0, import_mysql_core.decimal)("descuento_monto", { precision: 10, scale: 2 }).default("0.00"),
+    subtotal: (0, import_mysql_core.decimal)("subtotal", { precision: 10, scale: 2 }).notNull(),
+  },
+  (table) => [
+    (0, import_mysql_core.primaryKey)({ columns: [table.idDetallePresupuesto], name: "presupuesto_detalles_id_detalle" })
+  ]
+);
+
 0 && (module.exports = {
   adminsSaas,
   antecedentes,
@@ -815,7 +858,9 @@ const usuariosLogin = (0, import_mysql_core.mysqlTable)(
    tipoAntecedente,
   usuariosLogin,
   salidasDinero,
-  insumosProcedimiento
+  insumosProcedimiento,
+  presupuestos,
+  presupuestoDetalles
 });
 
 const salidasDinero = (0, import_mysql_core.mysqlTable)(

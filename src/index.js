@@ -33,6 +33,8 @@ const ausenciasRoutes = require('./modules/ausencias/ausenciasRoutes');
 const salidasDineroRoutes = require('./modules/salidasDinero/salidasDineroRoutes');
 const labRoutes = require('./modules/laboratorio/labRoutes');
 const labWorkRoutes = require('./modules/laboratorio/labWorkRoutes');
+const dashboardRoutes = require('./modules/dashboard/dashboardRoutes');
+const presupuestosRoutes = require('./modules/presupuestos/presupuestosRoutes');
 const app = express();
 
 app.use(
@@ -84,6 +86,8 @@ app.use('/ausencias', ausenciasRoutes);
 app.use('/salidas-dinero', salidasDineroRoutes);
 app.use('/laboratorios', labRoutes);
 app.use('/trabajos-laboratorio', labWorkRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/presupuestos', presupuestosRoutes);
 // app.use("/uploads", express.static("/var/www/uploads"));
 app.use('/uploads', cors(corsOptions), express.static('uploads'));
 app.use("/api/archivos", archivosRoutes);
