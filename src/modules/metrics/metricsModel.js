@@ -66,11 +66,13 @@ const MetricsModel = {
     },
 
     /**
-     * Egresos: suma de (cantidad * costoUnitario) de movimientos de inventario
-     * tipo "Entrada" (compras) en el período.
+     * Egresos: suma de (cantidad * costoUnitario) de movimientos de inventario tipo "Entrada" (compras)
+     * + suma de costos de salidasDinero
+     * + suma de costos de Trabajos de Laboratorio Terminados
      */
     getEgresos: async (id_clinica, fecha_inicio, fecha_fin) => {
-        const result = await db
+        // 1. Gastos de Inventario
+        const invResult = await db
             .select({
                 total: sum(
                     sql`${movimientosInventario.cantidad} * ${productos.costoUnitario}`
@@ -89,7 +91,26 @@ const MetricsModel = {
                     lte(sql`DATE(${movimientosInventario.fechaMovimiento})`, fecha_fin)
                 )
             );
-        return Number(result[0]?.total ?? 0);
+        const invTotal = Number(invResult[0]?.total ?? 0);
+
+        // 2. Gastos de Laboratorio (Terminados)
+        const { trabajosLaboratorio } = require('../laboratorio/labSchema');
+        const labResult = await db
+            .select({
+                total: sum(trabajosLaboratorio.cost)
+            })
+            .from(trabajosLaboratorio)
+            .where(
+                and(
+                    eq(trabajosLaboratorio.clinicId, id_clinica),
+                    eq(trabajosLaboratorio.status, 'Terminado_Entregado'),
+                    gte(sql`DATE(${trabajosLaboratorio.updatedAt})`, fecha_inicio),
+                    lte(sql`DATE(${trabajosLaboratorio.updatedAt})`, fecha_fin)
+                )
+            );
+        const labTotal = Number(labResult[0]?.total ?? 0);
+
+        return invTotal + labTotal;
     },
 
     /**
