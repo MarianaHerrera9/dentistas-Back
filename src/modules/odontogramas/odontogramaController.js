@@ -87,7 +87,7 @@ const archive = async (req, res) => {
         const newId = await Odontograma.archiveAndSnapshot(
             id,
             snapshot,
-            req.user?.id,
+            req.user?.idUsuario || null,
             nota_cierre
         );
 
@@ -156,7 +156,7 @@ const addProcedimiento = async (req, res) => {
 const createVersion = async (req, res) => {
     try {
         const { snapshot } = req.body;
-        const userId = req.user?.id ?? null; // por si no hay auth aún
+        const userId = req.user?.idUsuario || null; // por si no hay auth aún
 
         await VersionService.createSnapshotVersion(
             req.params.id,
