@@ -148,16 +148,19 @@ const Tratamiento = {
     },
 
     async update(id_plan, data) {
-        const [result] = await db.update(planTratamiento).set({
-            nombrePlan: data.nombre_plan ?? null,
-            fechaInicio: data.fecha_inicio ?? null,
-            fechaFinEstimada: data.fecha_fin_estimada ?? null,
-            costoTotalInicial: data.costo_total_inicial ?? 0,
-            costoAjustado: data.costo_ajustado ?? 0,
-            razonAjuste: data.razon_ajuste ?? null,
-            planPago: data.plan_pago ?? 'Pago unico',
-            estado: data.estado ?? 'En Progreso'
-        })
+        const updateData = {};
+        if (data.nombre_plan !== undefined) updateData.nombrePlan = data.nombre_plan;
+        if (data.fecha_inicio !== undefined) updateData.fechaInicio = data.fecha_inicio;
+        if (data.fecha_fin_estimada !== undefined) updateData.fechaFinEstimada = data.fecha_fin_estimada;
+        if (data.costo_total_inicial !== undefined) updateData.costoTotalInicial = data.costo_total_inicial;
+        if (data.costo_ajustado !== undefined) updateData.costoAjustado = data.costo_ajustado;
+        if (data.razon_ajuste !== undefined) updateData.razonAjuste = data.razon_ajuste;
+        if (data.plan_pago !== undefined) updateData.planPago = data.plan_pago;
+        if (data.estado !== undefined) updateData.estado = data.estado;
+
+        if (Object.keys(updateData).length === 0) return 0;
+
+        const [result] = await db.update(planTratamiento).set(updateData)
             .where(eq(planTratamiento.idPlan, id_plan));
 
         return result.affectedRows;
