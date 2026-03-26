@@ -28,6 +28,11 @@ const OdontogramaProcedimiento = {
             descripcion: descripcion
         });
 
+        // Actualizar el estado del procedimiento en el plan a 'Realizado'
+        await connection.update(planTratamientoProcedimientos)
+            .set({ status: 'Realizado' })
+            .where(eq(planTratamientoProcedimientos.idProcedimiento, id_plan_tratamiento_procedimiento));
+
         return result.insertId; // ← id_odontograma_procedimiento
     },
 

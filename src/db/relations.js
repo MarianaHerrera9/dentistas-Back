@@ -56,7 +56,9 @@ __export(relations_exports, {
   rolesRelations: () => rolesRelations,
   stockActualRelations: () => stockActualRelations,
   tipoAntecedenteRelations: () => tipoAntecedenteRelations,
-  usuariosLoginRelations: () => usuariosLoginRelations
+  usuariosLoginRelations: () => usuariosLoginRelations,
+  presupuestosRelations: () => presupuestosRelations,
+  presupuestoDetallesRelations: () => presupuestoDetallesRelations
 });
 module.exports = __toCommonJS(relations_exports);
 var import_relations = require("drizzle-orm/relations");
@@ -501,3 +503,31 @@ const stockActualRelations = (0, import_relations.relations)(import_schema.stock
     references: [import_schema.productos.idProducto]
   })
 }));
+
+const presupuestosRelations = (0, import_relations.relations)(import_schema.presupuestos, ({ one, many }) => ({
+  clinica: one(import_schema.clinicas, {
+    fields: [import_schema.presupuestos.idClinica],
+    references: [import_schema.clinicas.idClinica]
+  }),
+  paciente: one(import_schema.pacientes, {
+    fields: [import_schema.presupuestos.idPaciente],
+    references: [import_schema.pacientes.idPaciente]
+  }),
+  dentista: one(import_schema.dentistas, {
+    fields: [import_schema.presupuestos.idDentista],
+    references: [import_schema.dentistas.idDentista]
+  }),
+  detalles: many(import_schema.presupuestoDetalles)
+}));
+
+const presupuestoDetallesRelations = (0, import_relations.relations)(import_schema.presupuestoDetalles, ({ one }) => ({
+  presupuesto: one(import_schema.presupuestos, {
+    fields: [import_schema.presupuestoDetalles.idPresupuesto],
+    references: [import_schema.presupuestos.idPresupuesto]
+  }),
+  procedimiento: one(import_schema.catalogoProcedimientos, {
+    fields: [import_schema.presupuestoDetalles.idCatalogoProcedimiento],
+    references: [import_schema.catalogoProcedimientos.idCatalogoProcedimiento]
+  })
+}));
+
