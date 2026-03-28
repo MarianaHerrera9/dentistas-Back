@@ -112,6 +112,14 @@ const CitasService = {
         return CitasModel.updateStatus(id_cita, 'Completada');
     },
 
+    asistio(id_cita) {
+        return CitasModel.updateStatus(id_cita, 'Asistió');
+    },
+
+    noAsistio(id_cita) {
+        return CitasModel.updateStatus(id_cita, 'No asistió');
+    },
+
     async reagendar(id_cita, data) {
         const [rows] = await CitasModel.hasOverlap(data);
         if (rows[0].total > 0) throw new Error('Horario no disponible');

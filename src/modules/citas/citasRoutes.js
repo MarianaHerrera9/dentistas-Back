@@ -12,6 +12,8 @@ router.patch('/:id/cancelar', authMiddleware, ctrl.cancelar);
 router.patch('/:id/confirmar', authMiddleware, ctrl.confirmar);
 router.patch('/:id/completar', authMiddleware, ctrl.completar);
 router.patch('/:id/reagendar', authMiddleware, ctrl.reagendar);
+router.patch('/:id/asistio', authMiddleware, ctrl.asistio);
+router.patch('/:id/no-asistio', authMiddleware, ctrl.noAsistio);
 router.put('/:id', authMiddleware, ctrl.update);
 
 router.get('/paciente/:id_paciente', authMiddleware, ctrl.listByPaciente);

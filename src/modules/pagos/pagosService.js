@@ -30,14 +30,44 @@ const PagosService = {
             fecha_pago,
             referencia,
             nota,
+            tipo_pago = 'Tratamiento'
         } = data;
 
-        if (!id_paciente || !id_plan || !monto || !metodo_pago || !id_clinica) {
-            throw new Error('Datos obligatorios incompletos (paciente, plan, monto, método o clínica)');
+        // Validación base
+        if (!id_paciente || !monto || !metodo_pago || !id_clinica) {
+            throw new Error('Datos obligatorios incompletos (paciente, monto, método o clínica)');
+        }
+
+        // Si es tratamiento normal o uso de saldo, requiere plan
+        if (tipo_pago !== 'Anticipo' && !id_plan) {
+            throw new Error('Debe especificar un plan de tratamiento para este tipo de pago');
         }
 
         try {
+            const PacienteModel = require('../pacientes/pacienteModel');
+
             return await db.transaction(async (tx) => {
+                // 1. Obtener paciente para el saldo actual
+                const pacienteActual = await PacienteModel.findById(id_paciente);
+                if (!pacienteActual) throw new Error('Paciente no encontrado');
+
+                const saldoActual = Number(pacienteActual.saldo_favor || 0);
+
+                // 2. Gestionar el saldo según el tipo de pago
+                if (tipo_pago === 'Anticipo') {
+                    // SUMAR AL SALDO A FAVOR
+                    const nuevoSaldo = saldoActual + Number(monto);
+                    await PacienteModel.updateSaldoFavor(id_paciente, nuevoSaldo, tx);
+                } else if (tipo_pago === 'Uso de Saldo') {
+                    // RESTAR DEL SALDO A FAVOR
+                    if (saldoActual < Number(monto)) {
+                        throw new Error(`Saldo insuficiente. El paciente solo tiene ${saldoActual}`);
+                    }
+                    const nuevoSaldo = saldoActual - Number(monto);
+                    await PacienteModel.updateSaldoFavor(id_paciente, nuevoSaldo, tx);
+                }
+
+                // 3. Crear el registro de pago
                 const pagoId = await PagosModel.create({
                     id_cuota,
                     id_paciente,
@@ -48,15 +78,17 @@ const PagosService = {
                     fecha_pago,
                     referencia,
                     nota,
+                    tipo_pago // Pasamos el tipo
                 }, tx);
 
+                // 4. Marcar cuota si aplica
                 if (id_cuota) {
                     await CuotasModel.marcarComoPagada(id_cuota, tx);
                 }
 
                 return {
                     id_pago: pagoId,
-                    message: 'Pago registrado correctamente'
+                    message: tipo_pago === 'Anticipo' ? 'Anticipo registrado y saldo actualizado' : 'Pago registrado correctamente'
                 };
             });
         } catch (error) {

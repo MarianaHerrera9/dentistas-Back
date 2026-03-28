@@ -70,6 +70,24 @@ exports.completar = async (req, res, next) => {
     }
 };
 
+exports.asistio = async (req, res, next) => {
+    try {
+        await CitasService.asistio(req.params.id);
+        res.json({ message: 'Cita asistida' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.noAsistio = async (req, res, next) => {
+    try {
+        await CitasService.noAsistio(req.params.id);
+        res.json({ message: 'Cita no asistida' });
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.reagendar = async (req, res, next) => {
     try {
         await CitasService.reagendar(req.params.id, req.body);

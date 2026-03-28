@@ -17,6 +17,7 @@ const pagosCols = {
   metodo_pago: pagos.metodoPago,
   fecha_pago: pagos.fechaPago,
   referencia: pagos.referencia,
+  tipo_pago: pagos.tipoPago,
   nota: pagos.nota
 };
 
@@ -38,12 +39,13 @@ const PagosModel = {
     const [result] = await connection.insert(pagos).values({
       idCuota: id_cuota || null,
       idPaciente: id_paciente,
-      idPlan: id_plan,
+      idPlan: id_plan || null,
       idClinica: id_clinica,
       monto: monto,
       metodoPago: metodo_pago,
       fechaPago: fecha_pago || new Date(),
       referencia: referencia || null,
+      tipoPago: data.tipo_pago || 'Tratamiento',
       nota: nota || null
     });
 
@@ -137,7 +139,7 @@ const PagosModel = {
       metodo_pago: pagos.metodoPago,
       cuota: sql`COALESCE(${cuotasTratamiento.idCuota}, 0)`.mapWith(Number),
       nombre_plan: planTratamiento.nombrePlan,
-      tipo: sql`CASE WHEN ${cuotasTratamiento.idCuota} IS NULL THEN 'Pago único' ELSE 'Cuota' END`
+      tipo: pagos.tipoPago
     })
       .from(pagos)
       .leftJoin(cuotasTratamiento, eq(pagos.idCuota, cuotasTratamiento.idCuota))
@@ -158,10 +160,10 @@ const PagosModel = {
       referencia: pagos.referencia,
       fecha: sql`DATE(${pagos.fechaPago})`,
       metodo_pago: pagos.metodoPago,
-      tipo: sql`CASE WHEN ${pagos.idCuota} IS NULL THEN 'Pago único' ELSE 'Cuota' END`
+      tipo: pagos.tipoPago
     })
       .from(pagos)
-      .innerJoin(planTratamiento, eq(planTratamiento.idPlan, pagos.idPlan))
+      .leftJoin(planTratamiento, eq(planTratamiento.idPlan, pagos.idPlan))
       .innerJoin(pacientes, eq(pacientes.idPaciente, pagos.idPaciente))
       .where(eq(pagos.idClinica, id_clinica))
       .orderBy(desc(pagos.fechaPago));

@@ -206,7 +206,7 @@ const citas = (0, import_mysql_core.mysqlTable)(
     fechaCita: (0, import_mysql_core.date)("fecha_cita", { mode: "string" }).notNull(),
     horaInicio: (0, import_mysql_core.time)("hora_inicio").notNull(),
     horaFin: (0, import_mysql_core.time)("hora_fin").notNull(),
-    estado: (0, import_mysql_core.mysqlEnum)(["Pendiente", "Confirmada", "Cancelada", "Completada"]).notNull(),
+    estado: (0, import_mysql_core.mysqlEnum)(["Pendiente", "Confirmada", "Cancelada", "Completada", "Asistió", "No asistió"]).notNull(),
     idProcedimiento: (0, import_mysql_core.int)("id_procedimiento").references(() => catalogoProcedimientos.idCatalogoProcedimiento),
     notas: (0, import_mysql_core.text)(),
     creadoPor: (0, import_mysql_core.mysqlEnum)("creado_por", ["Paciente", "Recepcionista", "Dentista"]).notNull()
@@ -324,6 +324,7 @@ const dentistas = (0, import_mysql_core.mysqlTable)(
     telefono: (0, import_mysql_core.varchar)({ length: 15 }),
     correo: (0, import_mysql_core.varchar)({ length: 100 }),
     especialidad: (0, import_mysql_core.varchar)({ length: 100 }),
+    color: (0, import_mysql_core.varchar)({ length: 7 }).default("#00676E"),
     activo: (0, import_mysql_core.tinyint)().default(1),
     fechaRegistro: (0, import_mysql_core.timestamp)("fecha_registro", { mode: "string" }).defaultNow()
   },
@@ -514,7 +515,8 @@ const pacientes = (0, import_mysql_core.mysqlTable)(
     requiereTutor: (0, import_mysql_core.tinyint)("requiere_tutor").default(0),
     nombreTutor: (0, import_mysql_core.varchar)("nombre_tutor", { length: 200 }),
     telefonoTutor: (0, import_mysql_core.varchar)("telefono_tutor", { length: 15 }),
-    canalAdquisicion: (0, import_mysql_core.varchar)("canal_adquisicion", { length: 100 })
+    canalAdquisicion: (0, import_mysql_core.varchar)("canal_adquisicion", { length: 100 }),
+    saldoFavor: (0, import_mysql_core.decimal)("saldo_favor", { precision: 10, scale: 2 }).default("0.00"),
   },
   (table) => [
     (0, import_mysql_core.index)("id_clinica").on(table.idClinica),
@@ -549,6 +551,7 @@ const pagos = (0, import_mysql_core.mysqlTable)(
     metodoPago: (0, import_mysql_core.mysqlEnum)("metodo_pago", ["Efectivo", "Tarjeta", "Transferencia"]).default("Efectivo"),
     fechaPago: (0, import_mysql_core.timestamp)("fecha_pago", { mode: "string" }).defaultNow(),
     referencia: (0, import_mysql_core.varchar)({ length: 100 }),
+    tipoPago: (0, import_mysql_core.mysqlEnum)("tipo_pago", ["Tratamiento", "Anticipo", "Uso de Saldo"]).default("Tratamiento"),
     nota: (0, import_mysql_core.text)()
   },
   (table) => [
