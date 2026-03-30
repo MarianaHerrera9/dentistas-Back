@@ -189,7 +189,8 @@ const catalogoProcedimientos = (0, import_mysql_core.mysqlTable)(
     nombre: (0, import_mysql_core.varchar)({ length: 150 }).notNull(),
     descripcion: (0, import_mysql_core.text)(),
     activo: (0, import_mysql_core.tinyint)().default(1),
-    color: (0, import_mysql_core.varchar)({ length: 7 }).default("#00676E").notNull()
+    color: (0, import_mysql_core.varchar)({ length: 7 }).default("#00676E").notNull(),
+    costoPorPieza: (0, import_mysql_core.tinyint)("costo_por_pieza").default(1)
   },
   (table) => [
     (0, import_mysql_core.primaryKey)({ columns: [table.idCatalogoProcedimiento], name: "catalogo_procedimientos_id_catalogo_procedimiento" })

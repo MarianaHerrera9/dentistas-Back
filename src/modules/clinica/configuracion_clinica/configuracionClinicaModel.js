@@ -40,7 +40,8 @@ const ConfiguracionClinica = {
         zona_horaria,
         dias_laborales,
         hora_inicio_clinica,
-        hora_fin_clinica
+        hora_fin_clinica,
+        modo_color_agenda
       FROM configuracion_clinica
       WHERE id_clinica = ?`,
       [idClinica]
@@ -78,7 +79,8 @@ const ConfiguracionClinica = {
              zona_horaria = ?,
              dias_laborales = ?,
              hora_inicio_clinica = ?,
-             hora_fin_clinica = ?
+             hora_fin_clinica = ?,
+             modo_color_agenda = ?
          WHERE id_clinica = ?`,
         [
           data.duracion_bloque,
@@ -93,6 +95,7 @@ const ConfiguracionClinica = {
           diasLaborales,
           data.hora_inicio_clinica,
           data.hora_fin_clinica,
+          data.modo_color_agenda || 'dentista',
           idClinica,
         ]
       );
@@ -111,8 +114,9 @@ const ConfiguracionClinica = {
           zona_horaria,
           dias_laborales,
           hora_inicio_clinica,
-          hora_fin_clinica
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          hora_fin_clinica,
+          modo_color_agenda
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           idClinica,
           data.duracion_bloque,
@@ -127,6 +131,7 @@ const ConfiguracionClinica = {
           diasLaborales,
           data.hora_inicio_clinica,
           data.hora_fin_clinica,
+          data.modo_color_agenda || 'dentista',
         ]
       );
     }
