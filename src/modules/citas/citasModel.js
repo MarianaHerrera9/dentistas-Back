@@ -154,6 +154,7 @@ const CitasModel = {
     async update(id_cita, data) {
         const [result] = await db.update(citas)
             .set({
+                idDentista: data.id_dentista,
                 fechaCita: data.fecha_cita,
                 horaInicio: data.hora_inicio,
                 horaFin: data.hora_fin,

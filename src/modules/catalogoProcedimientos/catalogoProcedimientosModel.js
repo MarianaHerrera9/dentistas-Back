@@ -11,7 +11,8 @@ const CatalogoProcedimientos = {
                 nombre: data.nombre,
                 descripcion: data.descripcion ?? null,
                 activo: data.activo ?? 1,
-                color: data.color ?? '#00676E'
+                color: data.color ?? '#00676E',
+                costoPorPieza: data.costo_por_pieza ?? 1
             });
 
             const id_procedimiento = result.insertId;
@@ -47,6 +48,7 @@ const CatalogoProcedimientos = {
                 descripcion: catalogoProcedimientos.descripcion,
                 activo: catalogoProcedimientos.activo,
                 color: catalogoProcedimientos.color,
+                costo_por_pieza: catalogoProcedimientos.costoPorPieza,
                 precio: preciosProcedimientos.precio,
                 insumo_id: insumosProcedimiento.idProducto,
                 insumo_cantidad: insumosProcedimiento.cantidad,
@@ -71,6 +73,7 @@ const CatalogoProcedimientos = {
                 descripcion: catalogoProcedimientos.descripcion,
                 activo: catalogoProcedimientos.activo,
                 color: catalogoProcedimientos.color,
+                costo_por_pieza: catalogoProcedimientos.costoPorPieza,
                 precio: preciosProcedimientos.precio,
                 insumo_id: insumosProcedimiento.idProducto,
                 insumo_cantidad: insumosProcedimiento.cantidad,
@@ -96,6 +99,7 @@ const CatalogoProcedimientos = {
                 descripcion: catalogoProcedimientos.descripcion,
                 activo: catalogoProcedimientos.activo,
                 color: catalogoProcedimientos.color,
+                costo_por_pieza: catalogoProcedimientos.costoPorPieza,
                 precio: preciosProcedimientos.precio,
                 insumo_id: insumosProcedimiento.idProducto,
                 insumo_cantidad: insumosProcedimiento.cantidad,
@@ -120,7 +124,8 @@ const CatalogoProcedimientos = {
                     nombre: data.nombre,
                     descripcion: data.descripcion ?? null,
                     activo: data.activo ?? 1,
-                    color: data.color ?? '#00676E'
+                    color: data.color ?? '#00676E',
+                    costoPorPieza: data.costo_por_pieza ?? 1
                 })
                 .where(eq(catalogoProcedimientos.idCatalogoProcedimiento, id));
 

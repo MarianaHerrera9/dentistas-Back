@@ -12,6 +12,7 @@ const Dentista = {
       telefono: data.telefono,
       correo: data.correo,
       especialidad: data.especialidad,
+      color: data.color || '#00676E',
       activo: 1
     });
     return result.insertId;
@@ -26,6 +27,7 @@ const Dentista = {
       especialidad: dentistas.especialidad,
       telefono: dentistas.telefono,
       correo: dentistas.correo,
+      color: dentistas.color,
       activo: dentistas.activo
     }).from(dentistas).where(eq(dentistas.idDentista, id_dentista));
     return result[0];
@@ -38,7 +40,8 @@ const Dentista = {
         apellidoMaterno: data.apellido_materno,
         telefono: data.telefono,
         correo: data.correo,
-        especialidad: data.especialidad
+        especialidad: data.especialidad,
+        color: data.color
       })
       .where(eq(dentistas.idDentista, id));
     return result.affectedRows > 0;

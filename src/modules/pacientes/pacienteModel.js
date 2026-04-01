@@ -20,7 +20,8 @@ const pCols = {
   telefono_tutor: pacientes.telefonoTutor,
   activo: pacientes.activo,
   fecha_registro: pacientes.fechaRegistro,
-  canal_adquisicion: pacientes.canalAdquisicion
+  canal_adquisicion: pacientes.canalAdquisicion,
+  saldo_favor: pacientes.saldoFavor
 };
 
 const Paciente = {
@@ -93,6 +94,13 @@ const Paciente = {
       .set({ activo: sql`NOT ${pacientes.activo}` })
       .where(eq(pacientes.idPaciente, id_paciente));
 
+    return result.affectedRows;
+  },
+
+  async updateSaldoFavor(id_paciente, nuevoSaldo, connection = db) {
+    const [result] = await connection.update(pacientes)
+      .set({ saldoFavor: nuevoSaldo.toString() })
+      .where(eq(pacientes.idPaciente, id_paciente));
     return result.affectedRows;
   }
 };

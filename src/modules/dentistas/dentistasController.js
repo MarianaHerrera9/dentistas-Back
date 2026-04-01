@@ -18,6 +18,7 @@ const DentistaController = {
           telefono,
           correo,
           especialidad,
+          color,
           fecha_registro,
           CASE WHEN activo = 1 THEN 'Activo' ELSE 'Inactivo' END AS status
         FROM dentistas
