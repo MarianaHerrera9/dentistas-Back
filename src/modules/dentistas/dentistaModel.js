@@ -13,6 +13,9 @@ const Dentista = {
       correo: data.correo,
       especialidad: data.especialidad,
       color: data.color || '#00676E',
+      cedulaProfesional: data.cedula_profesional,
+      institucionEgreso: data.institucion_egreso,
+      tituloOtorgado: data.titulo_otorgado,
       activo: 1
     });
     return result.insertId;
@@ -28,6 +31,9 @@ const Dentista = {
       telefono: dentistas.telefono,
       correo: dentistas.correo,
       color: dentistas.color,
+      cedula_profesional: dentistas.cedulaProfesional,
+      institucion_egreso: dentistas.institucionEgreso,
+      titulo_otorgado: dentistas.tituloOtorgado,
       activo: dentistas.activo
     }).from(dentistas).where(eq(dentistas.idDentista, id_dentista));
     return result[0];
@@ -41,7 +47,10 @@ const Dentista = {
         telefono: data.telefono,
         correo: data.correo,
         especialidad: data.especialidad,
-        color: data.color
+        color: data.color,
+        cedulaProfesional: data.cedula_profesional,
+        institucionEgreso: data.institucion_egreso,
+        tituloOtorgado: data.titulo_otorgado
       })
       .where(eq(dentistas.idDentista, id));
     return result.affectedRows > 0;

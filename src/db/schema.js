@@ -15,57 +15,9 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var schema_exports = {};
-__export(schema_exports, {
-  adminsSaas: () => adminsSaas,
-  antecedentes: () => antecedentes,
-  archivosClinicas: () => archivosClinicas,
-  auditoria: () => auditoria,
-  ausenciasDentistas: () => ausenciasDentistas,
-  bloquesDisponibilidad: () => bloquesDisponibilidad,
-  catalogoDiagnosticos: () => catalogoDiagnosticos,
-  catalogoProcedimientos: () => catalogoProcedimientos,
-  citas: () => citas,
-  clinicas: () => clinicas,
-  configuracionClinica: () => configuracionClinica,
-  consultas: () => consultas,
-  cuotasTratamiento: () => cuotasTratamiento,
-  datosFacturacion: () => datosFacturacion,
-  dentistas: () => dentistas,
-  examenClinicoInicialExtraoral: () => examenClinicoInicialExtraoral,
-  examenClinicoInicialIntraoral: () => examenClinicoInicialIntraoral,
-  lotesProductos: () => lotesProductos,
-  materialesUsados: () => materialesUsados,
-  movimientosInventario: () => movimientosInventario,
-  odontogramaDiagnosticos: () => odontogramaDiagnosticos,
-  odontogramaProcedimientos: () => odontogramaProcedimientos,
-  odontogramaVersiones: () => odontogramaVersiones,
-  odontogramas: () => odontogramas,
-  pacienteAtributosExtra: () => pacienteAtributosExtra,
-  pacientes: () => pacientes,
-  pacientesLogin: () => pacientesLogin,
-  pagos: () => pagos,
-  periodontogramaDetalles: () => periodontogramaDetalles,
-  periodontogramas: () => periodontogramas,
-  permisos: () => permisos,
-  planTratamiento: () => planTratamiento,
-  planTratamientoProcedimientos: () => planTratamientoProcedimientos,
-  preciosProcedimientos: () => preciosProcedimientos,
-  productos: () => productos,
-  recibos: () => recibos,
-  rolPermiso: () => rolPermiso,
-  roles: () => roles,
-  stockActual: () => stockActual,
-  tipoAntecedente: () => tipoAntecedente,
-  usuariosLogin: () => usuariosLogin,
-  salidasDinero: () => salidasDinero,
-  insumosProcedimiento: () => insumosProcedimiento,
-  presupuestos: () => presupuestos,
-  presupuestoDetalles: () => presupuestoDetalles,
-});
-module.exports = __toCommonJS(schema_exports);
 var import_mysql_core = require("drizzle-orm/mysql-core");
 var import_drizzle_orm = require("drizzle-orm");
+var schema_exports = {};
 const ausenciasDentistas = (0, import_mysql_core.mysqlTable)(
   "ausencias_dentistas",
   {
@@ -326,6 +278,9 @@ const dentistas = (0, import_mysql_core.mysqlTable)(
     correo: (0, import_mysql_core.varchar)({ length: 100 }),
     especialidad: (0, import_mysql_core.varchar)({ length: 100 }),
     color: (0, import_mysql_core.varchar)({ length: 7 }).default("#00676E"),
+    cedulaProfesional: (0, import_mysql_core.varchar)("cedula_profesional", { length: 50 }),
+    institucionEgreso: (0, import_mysql_core.varchar)("institucion_egreso", { length: 150 }),
+    tituloOtorgado: (0, import_mysql_core.varchar)("titulo_otorgado", { length: 150 }),
     activo: (0, import_mysql_core.tinyint)().default(1),
     fechaRegistro: (0, import_mysql_core.timestamp)("fecha_registro", { mode: "string" }).defaultNow()
   },
@@ -778,7 +733,6 @@ const usuariosLogin = (0, import_mysql_core.mysqlTable)(
   ]
 );
 // Annotate the CommonJS export names for ESM import in node:
-
 const presupuestos = (0, import_mysql_core.mysqlTable)(
   "presupuestos",
   {
@@ -819,54 +773,6 @@ const presupuestoDetalles = (0, import_mysql_core.mysqlTable)(
   ]
 );
 
-0 && (module.exports = {
-  adminsSaas,
-  antecedentes,
-  archivosClinicas,
-  auditoria,
-  ausenciasDentistas,
-  bloquesDisponibilidad,
-  catalogoDiagnosticos,
-  catalogoProcedimientos,
-  citas,
-  clinicas,
-  configuracionClinica,
-  consultas,
-  cuotasTratamiento,
-  datosFacturacion,
-  dentistas,
-  examenClinicoInicialExtraoral,
-  examenClinicoInicialIntraoral,
-  lotesProductos,
-  materialesUsados,
-  movimientosInventario,
-  odontogramaDiagnosticos,
-  odontogramaProcedimientos,
-  odontogramaVersiones,
-  odontogramas,
-  pacienteAtributosExtra,
-  pacientes,
-  pacientesLogin,
-  pagos,
-  periodontogramaDetalles,
-  periodontogramas,
-  permisos,
-  planTratamiento,
-  planTratamientoProcedimientos,
-  preciosProcedimientos,
-  productos,
-  recibos,
-  rolPermiso,
-  roles,
-  stockActual,
-   tipoAntecedente,
-  usuariosLogin,
-  salidasDinero,
-  insumosProcedimiento,
-  presupuestos,
-  presupuestoDetalles
-});
-
 const salidasDinero = (0, import_mysql_core.mysqlTable)(
   "salidas_dinero",
   {
@@ -896,3 +802,104 @@ const insumosProcedimiento = (0, import_mysql_core.mysqlTable)(
     (0, import_mysql_core.primaryKey)({ columns: [table.idInsumo], name: "insumos_procedimiento_id_insumo" })
   ]
 );
+
+const recetas = (0, import_mysql_core.mysqlTable)(
+  "recetas",
+  {
+    idReceta: (0, import_mysql_core.int)("id_receta").autoincrement().notNull(),
+    idClinica: (0, import_mysql_core.int)("id_clinica").notNull().references(() => clinicas.idClinica, { onDelete: "cascade" }),
+    idPaciente: (0, import_mysql_core.int)("id_paciente").notNull().references(() => pacientes.idPaciente, { onDelete: "cascade" }),
+    idDentista: (0, import_mysql_core.int)("id_dentista").notNull().references(() => dentistas.idDentista, { onDelete: "restrict" }),
+    folio: (0, import_mysql_core.varchar)({ length: 20 }),
+    fechaEmision: (0, import_mysql_core.timestamp)("fecha_emision", { mode: "string" }).defaultNow(),
+    
+    // Opcionales/Vitales
+    peso: (0, import_mysql_core.decimal)({ precision: 5, scale: 2 }),
+    talla: (0, import_mysql_core.decimal)({ precision: 5, scale: 2 }),
+    imc: (0, import_mysql_core.decimal)({ precision: 5, scale: 2 }),
+    temperatura: (0, import_mysql_core.decimal)({ precision: 4, scale: 1 }),
+    presionArterial: (0, import_mysql_core.varchar)("presion_arterial", { length: 20 }),
+    alergias: (0, import_mysql_core.text)(),
+    diagnostico: (0, import_mysql_core.text)(),
+    
+    // Contexto del Paciente
+    edadPaciente: (0, import_mysql_core.int)("edad_paciente"),
+    generoPaciente: (0, import_mysql_core.mysqlEnum)("genero_paciente", ["M", "F", "Otro"]),
+  },
+  (table) => [
+    (0, import_mysql_core.primaryKey)({ columns: [table.idReceta], name: "recetas_id_receta" }),
+    (0, import_mysql_core.index)("idx_recetas_paciente").on(table.idPaciente),
+    (0, import_mysql_core.index)("idx_recetas_clinica").on(table.idClinica)
+  ]
+);
+
+const recetaMedicamentos = (0, import_mysql_core.mysqlTable)(
+  "receta_medicamentos",
+  {
+    idMedicamento: (0, import_mysql_core.int)("id_medicamento").autoincrement().notNull(),
+    idReceta: (0, import_mysql_core.int)("id_receta").notNull().references(() => recetas.idReceta, { onDelete: "cascade" }),
+    nombreGenerico: (0, import_mysql_core.varchar)("nombre_generico", { length: 255 }).notNull(),
+    formaFarmaceutica: (0, import_mysql_core.varchar)("forma_farmaceutica", { length: 100 }).notNull(),
+    dosis: (0, import_mysql_core.varchar)({ length: 100 }).notNull(),
+    presentacion: (0, import_mysql_core.varchar)({ length: 100 }).notNull(),
+    frecuencia: (0, import_mysql_core.varchar)({ length: 100 }).notNull(),
+    viaAdministracion: (0, import_mysql_core.varchar)("via_administracion", { length: 100 }).notNull(),
+    duracionTratamiento: (0, import_mysql_core.varchar)("duracion_tratamiento", { length: 100 }).notNull(),
+    indicaciones: (0, import_mysql_core.text)().notNull(),
+  },
+  (table) => [
+    (0, import_mysql_core.primaryKey)({ columns: [table.idMedicamento], name: "medicamentos_id_medicamento" }),
+    (0, import_mysql_core.index)("idx_medicamentos_receta").on(table.idReceta)
+  ]
+);
+
+__export(schema_exports, {
+  adminsSaas: () => adminsSaas,
+  antecedentes: () => antecedentes,
+  archivosClinicas: () => archivosClinicas,
+  auditoria: () => auditoria,
+  ausenciasDentistas: () => ausenciasDentistas,
+  bloquesDisponibilidad: () => bloquesDisponibilidad,
+  catalogoDiagnosticos: () => catalogoDiagnosticos,
+  catalogoProcedimientos: () => catalogoProcedimientos,
+  citas: () => citas,
+  clinicas: () => clinicas,
+  configuracionClinica: () => configuracionClinica,
+  consultas: () => consultas,
+  cuotasTratamiento: () => cuotasTratamiento,
+  datosFacturacion: () => datosFacturacion,
+  dentistas: () => dentistas,
+  examenClinicoInicialExtraoral: () => examenClinicoInicialExtraoral,
+  examenClinicoInicialIntraoral: () => examenClinicoInicialIntraoral,
+  lotesProductos: () => lotesProductos,
+  materialesUsados: () => materialesUsados,
+  movimientosInventario: () => movimientosInventario,
+  odontogramaDiagnosticos: () => odontogramaDiagnosticos,
+  odontogramaProcedimientos: () => odontogramaProcedimientos,
+  odontogramaVersiones: () => odontogramaVersiones,
+  odontogramas: () => odontogramas,
+  pacienteAtributosExtra: () => pacienteAtributosExtra,
+  pacientes: () => pacientes,
+  pacientesLogin: () => pacientesLogin,
+  pagos: () => pagos,
+  periodontogramaDetalles: () => periodontogramaDetalles,
+  periodontogramas: () => periodontogramas,
+  permisos: () => permisos,
+  planTratamiento: () => planTratamiento,
+  planTratamientoProcedimientos: () => planTratamientoProcedimientos,
+  preciosProcedimientos: () => preciosProcedimientos,
+  productos: () => productos,
+  recibos: () => recibos,
+  rolPermiso: () => rolPermiso,
+  roles: () => roles,
+  stockActual: () => stockActual,
+  tipoAntecedente: () => tipoAntecedente,
+  usuariosLogin: () => usuariosLogin,
+  salidasDinero: () => salidasDinero,
+  insumosProcedimiento: () => insumosProcedimiento,
+  presupuestos: () => presupuestos,
+  presupuestoDetalles: () => presupuestoDetalles,
+  recetas: () => recetas,
+  recetaMedicamentos: () => recetaMedicamentos,
+});
+module.exports = __toCommonJS(schema_exports);

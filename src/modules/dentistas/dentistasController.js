@@ -19,6 +19,9 @@ const DentistaController = {
           correo,
           especialidad,
           color,
+          cedula_profesional,
+          institucion_egreso,
+          titulo_otorgado,
           fecha_registro,
           CASE WHEN activo = 1 THEN 'Activo' ELSE 'Inactivo' END AS status
         FROM dentistas
@@ -52,6 +55,23 @@ const DentistaController = {
       res.status(500).json({ message: 'Error al crear el dentista' });
     }
   },
+
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const dentista = await Dentista.findById(id);
+      
+      if (!dentista) {
+        return res.status(404).json({ message: 'Dentista no encontrado' });
+      }
+      
+      res.status(200).json(dentista);
+    } catch (error) {
+      console.error("Error en getById dentista:", error);
+      res.status(500).json({ message: 'Error al obtener el dentista' });
+    }
+  },
+
   async update(req, res) {
     try {
       const { id } = req.params;
