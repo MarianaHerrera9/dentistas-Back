@@ -9,8 +9,12 @@ const AgendaService = {
         return AgendaModel.createBlock(data);
     },
 
-    getBlocks(id_clinica) {
-        return AgendaModel.getBlocksByClinic(id_clinica);
+    getBlocks(id_clinica, id_dentista, fetchAll = false) {
+        return AgendaModel.getBlocks(id_clinica, id_dentista, fetchAll);
+    },
+
+    bulkUpdate(id_clinica, id_dentista, blocks) {
+        return AgendaModel.bulkUpdate(id_clinica, id_dentista, blocks);
     },
 
     updateBlock(id, data) {

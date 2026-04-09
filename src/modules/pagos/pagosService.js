@@ -1,6 +1,8 @@
+const { sql } = require('drizzle-orm');
 const db = require('../../db/index');
 const PagosModel = require('./pagosModel');
 const CuotasModel = require('../cuotas/cuotasModel');
+const TratamientoModel = require('../tratamientos/tratamientoModel');
 
 const PagosService = {
 
@@ -84,6 +86,20 @@ const PagosService = {
                 // 4. Marcar cuota si aplica
                 if (id_cuota) {
                     await CuotasModel.marcarComoPagada(id_cuota, tx);
+                }
+
+                // 5. Verificar si el tratamiento se ha pagado por completo (automático)
+                if (id_plan && tipo_pago !== 'Anticipo') {
+                    // Usamos una consulta directa dentro de la transacción para evitar race conditions
+                    const [res] = await tx.execute(sql`
+                        SELECT 
+                            (SELECT COALESCE(NULLIF(costo_ajustado, 0), costo_total_inicial) FROM plan_tratamiento WHERE id_plan = ${id_plan}) as total_costo,
+                            (SELECT COALESCE(SUM(monto), 0) FROM pagos WHERE id_plan = ${id_plan}) as total_pagado
+                    `);
+                    
+                    if (res && Number(res.total_pagado) >= Number(res.total_costo)) {
+                        await tx.execute(sql`UPDATE plan_tratamiento SET estado = 'Completado' WHERE id_plan = ${id_plan}`);
+                    }
                 }
 
                 return {

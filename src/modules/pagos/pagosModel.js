@@ -1,5 +1,5 @@
 const db = require('../../db/index');
-const { eq, and, isNull, sql, desc, getTableColumns } = require('drizzle-orm');
+const { eq, and, isNull, sql, desc, getTableColumns, not } = require('drizzle-orm');
 const {
   pagos,
   cuotasTratamiento,
@@ -96,11 +96,13 @@ const PagosModel = {
       monto: cuotasTratamiento.monto,
       fecha_programada: cuotasTratamiento.fechaProgramada,
       pagada: cuotasTratamiento.pagada,
+      saldo_favor: pacientes.saldoFavor,
       nombre_plan: planTratamiento.nombrePlan,
       tipo: sql`'Cuota'`
     })
       .from(cuotasTratamiento)
       .innerJoin(planTratamiento, eq(cuotasTratamiento.idPlan, planTratamiento.idPlan))
+      .innerJoin(pacientes, eq(cuotasTratamiento.idPaciente, pacientes.idPaciente))
       .where(and(eq(cuotasTratamiento.idPaciente, id_paciente), eq(cuotasTratamiento.pagada, 0)));
 
     return result;
@@ -111,20 +113,26 @@ const PagosModel = {
     const result = await db.select({
       id_plan: planTratamiento.idPlan,
       nombre_plan: planTratamiento.nombrePlan,
-      monto: planTratamiento.costoTotalInicial,
+      monto_total: sql`COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial})`,
+      total_pagado: sql`COALESCE(SUM(${pagos.monto}), 0)`,
+      monto: sql`COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial}) - COALESCE(SUM(${pagos.monto}), 0)`,
+      saldo_favor: pacientes.saldoFavor,
       tipo: sql`'Pago único'`
     })
       .from(planTratamiento)
+      .innerJoin(pacientes, eq(planTratamiento.idPaciente, pacientes.idPaciente))
       .leftJoin(pagos, and(
         eq(planTratamiento.idPlan, pagos.idPlan),
-        isNull(pagos.idCuota)
+        isNull(pagos.idCuota),
+        not(eq(pagos.tipoPago, 'Anticipo'))
       ))
       .where(and(
         eq(planTratamiento.idPaciente, id_paciente),
-        eq(planTratamiento.planPago, 'Pago único')
+        eq(planTratamiento.planPago, 'Pago único'),
+        eq(planTratamiento.estado, 'En Progreso')
       ))
-      .groupBy(planTratamiento.idPlan)
-      .having(sql`COUNT(${pagos.idPago}) = 0`);
+      .groupBy(planTratamiento.idPlan, planTratamiento.costoAjustado, planTratamiento.costoTotalInicial, pacientes.saldoFavor)
+      .having(sql`COALESCE(SUM(${pagos.monto}), 0) < COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial})`);
 
     return result;
   },
@@ -178,6 +186,7 @@ const PagosModel = {
       nombre_plan: planTratamiento.nombrePlan,
       id_paciente: cuotasTratamiento.idPaciente,
       paciente: sql`CONCAT(${pacientes.nombre}, ' ', ${pacientes.apellidoPaterno}, ' ', IFNULL(${pacientes.apellidoMaterno}, ''))`,
+      saldo_favor: pacientes.saldoFavor,
       monto: cuotasTratamiento.monto,
       fecha: cuotasTratamiento.fechaProgramada,
       tipo: sql`'Cuota'`
@@ -197,7 +206,10 @@ const PagosModel = {
       nombre_plan: planTratamiento.nombrePlan,
       id_paciente: planTratamiento.idPaciente,
       paciente: sql`CONCAT(${pacientes.nombre}, ' ', ${pacientes.apellidoPaterno}, ' ', IFNULL(${pacientes.apellidoMaterno}, ''))`,
-      monto: planTratamiento.costoTotalInicial,
+      saldo_favor: pacientes.saldoFavor,
+      total_pagado: sql`COALESCE(SUM(${pagos.monto}), 0)`,
+      monto_total: sql`COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial})`,
+      monto: sql`COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial}) - COALESCE(SUM(${pagos.monto}), 0)`,
       fecha: planTratamiento.fechaInicio,
       tipo: sql`'Pago único'`
     })
@@ -205,14 +217,16 @@ const PagosModel = {
       .innerJoin(pacientes, eq(pacientes.idPaciente, planTratamiento.idPaciente))
       .leftJoin(pagos, and(
         eq(planTratamiento.idPlan, pagos.idPlan),
-        isNull(pagos.idCuota)
+        isNull(pagos.idCuota),
+        not(eq(pagos.tipoPago, 'Anticipo'))
       ))
       .where(and(
         eq(planTratamiento.idClinica, id_clinica),
-        eq(planTratamiento.planPago, 'Pago único')
+        eq(planTratamiento.planPago, 'Pago único'),
+        eq(planTratamiento.estado, 'En Progreso')
       ))
-      .groupBy(planTratamiento.idPlan)
-      .having(sql`COUNT(${pagos.idPago}) = 0`);
+      .groupBy(planTratamiento.idPlan, pacientes.idPaciente, planTratamiento.costoAjustado, planTratamiento.costoTotalInicial)
+      .having(sql`COALESCE(SUM(${pagos.monto}), 0) < COALESCE(NULLIF(${planTratamiento.costoAjustado}, 0), ${planTratamiento.costoTotalInicial})`);
 
     return result;
   },

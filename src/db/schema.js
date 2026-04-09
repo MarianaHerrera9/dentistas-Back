@@ -109,6 +109,7 @@ const bloquesDisponibilidad = (0, import_mysql_core.mysqlTable)(
   {
     idBloque: (0, import_mysql_core.int)("id_bloque").autoincrement().notNull(),
     idClinica: (0, import_mysql_core.int)("id_clinica").notNull().references(() => clinicas.idClinica, { onDelete: "cascade" }),
+    idDentista: (0, import_mysql_core.int)("id_dentista").references(() => dentistas.idDentista, { onDelete: "cascade" }),
     diaSemana: (0, import_mysql_core.mysqlEnum)("dia_semana", ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"]).notNull(),
     horaInicio: (0, import_mysql_core.time)("hora_inicio").notNull(),
     horaFin: (0, import_mysql_core.time)("hora_fin").notNull(),
@@ -203,6 +204,7 @@ const configuracionClinica = (0, import_mysql_core.mysqlTable)(
     permiteAgendamientoOnline: (0, import_mysql_core.tinyint)("permite_agendamiento_online").default(1),
     toleranciaLlegadaMinutos: (0, import_mysql_core.int)("tolerancia_llegada_minutos").default(0),
     permitirReservaSuperpuesta: (0, import_mysql_core.tinyint)("permitir_reserva_superpuesta").default(0),
+    maxCitasSimultaneas: (0, import_mysql_core.int)("max_citas_simultaneas").default(1),
     zonaHoraria: (0, import_mysql_core.varchar)("zona_horaria", { length: 50 }),
     fechaActualizacion: (0, import_mysql_core.timestamp)("fecha_actualizacion", { mode: "string" }).defaultNow().onUpdateNow(),
     requiereAnticipo: (0, import_mysql_core.tinyint)("requiere_anticipo").default(0),

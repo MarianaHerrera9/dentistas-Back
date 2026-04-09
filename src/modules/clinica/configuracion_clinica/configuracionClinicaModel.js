@@ -41,7 +41,8 @@ const ConfiguracionClinica = {
         dias_laborales,
         hora_inicio_clinica,
         hora_fin_clinica,
-        modo_color_agenda
+        modo_color_agenda,
+        max_citas_simultaneas
       FROM configuracion_clinica
       WHERE id_clinica = ?`,
       [idClinica]
@@ -80,7 +81,8 @@ const ConfiguracionClinica = {
              dias_laborales = ?,
              hora_inicio_clinica = ?,
              hora_fin_clinica = ?,
-             modo_color_agenda = ?
+             modo_color_agenda = ?,
+             max_citas_simultaneas = ?
          WHERE id_clinica = ?`,
         [
           data.duracion_bloque,
@@ -96,6 +98,7 @@ const ConfiguracionClinica = {
           data.hora_inicio_clinica,
           data.hora_fin_clinica,
           data.modo_color_agenda || 'dentista',
+          data.max_citas_simultaneas || 1,
           idClinica,
         ]
       );
@@ -115,8 +118,9 @@ const ConfiguracionClinica = {
           dias_laborales,
           hora_inicio_clinica,
           hora_fin_clinica,
-          modo_color_agenda
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          modo_color_agenda,
+          max_citas_simultaneas
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           idClinica,
           data.duracion_bloque,
@@ -132,6 +136,7 @@ const ConfiguracionClinica = {
           data.hora_inicio_clinica,
           data.hora_fin_clinica,
           data.modo_color_agenda || 'dentista',
+          data.max_citas_simultaneas || 1,
         ]
       );
     }
